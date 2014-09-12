@@ -4,11 +4,11 @@ import java.util.Random;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
-import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import com.mauriciotogneri.swipeit.R;
 import com.mauriciotogneri.swipeit.objects.Square;
+import com.mauriciotogneri.swipeit.objects.Square.Type;
 import com.mauriciotogneri.swipeit.util.ShaderHelper;
 import com.mauriciotogneri.swipeit.util.TextResourceReader;
 
@@ -33,7 +33,10 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 	private static final int RESOLUTION_X = 7;
 	private static final int RESOLUTION_Y = 11;
 
-	private Square square;
+	private Square squareUp;
+	private Square squareDown;
+	private Square squareLeft;
+	private Square squareRight;
 	
 	public Renderer(Context context)
 	{
@@ -45,9 +48,9 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		float screenX = getScreenX(x);
 		float screenY = getScreenY(y);
 
-		if (this.square.isInside(screenX, screenY))
+		if (this.squareUp.isInside(screenX, screenY))
 		{
-			createSquare();
+			createSquare(Square.Type.UP);
 		}
 	}
 
@@ -56,9 +59,9 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		float screenX = getScreenX(x);
 		float screenY = getScreenY(y);
 
-		if (this.square.isInside(screenX, screenY))
+		if (this.squareDown.isInside(screenX, screenY))
 		{
-			createSquare();
+			createSquare(Square.Type.DOWN);
 		}
 	}
 
@@ -67,9 +70,9 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		float screenX = getScreenX(x);
 		float screenY = getScreenY(y);
 
-		if (this.square.isInside(screenX, screenY))
+		if (this.squareLeft.isInside(screenX, screenY))
 		{
-			createSquare();
+			createSquare(Square.Type.LEFT);
 		}
 	}
 
@@ -78,9 +81,9 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		float screenX = getScreenX(x);
 		float screenY = getScreenY(y);
 
-		if (this.square.isInside(screenX, screenY))
+		if (this.squareRight.isInside(screenX, screenY))
 		{
-			createSquare();
+			createSquare(Square.Type.RIGHT);
 		}
 	}
 
@@ -94,16 +97,35 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		return Renderer.RESOLUTION_Y - (y / this.height * Renderer.RESOLUTION_Y);
 	}
 	
-	private void createSquare()
+	private void createSquare(Type type)
 	{
 		Random random = new Random();
-		this.square = new Square(this.positionLocation, this.colorLocation, Color.BLUE, random.nextInt(Renderer.RESOLUTION_X) + 0.5f, random.nextInt(Renderer.RESOLUTION_Y) + 0.5f);
+		
+		switch (type)
+		{
+			case UP:
+				this.squareUp = new Square(this.positionLocation, this.colorLocation, Type.UP, random.nextInt(Renderer.RESOLUTION_X) + 0.5f, random.nextInt(Renderer.RESOLUTION_Y) + 0.5f);
+				break;
+			case DOWN:
+				this.squareDown = new Square(this.positionLocation, this.colorLocation, Type.DOWN, random.nextInt(Renderer.RESOLUTION_X) + 0.5f, random.nextInt(Renderer.RESOLUTION_Y) + 0.5f);
+				break;
+			case LEFT:
+				this.squareLeft = new Square(this.positionLocation, this.colorLocation, Type.LEFT, random.nextInt(Renderer.RESOLUTION_X) + 0.5f, random.nextInt(Renderer.RESOLUTION_Y) + 0.5f);
+				break;
+			case RIGHT:
+				this.squareRight = new Square(this.positionLocation, this.colorLocation, Type.RIGHT, random.nextInt(Renderer.RESOLUTION_X) + 0.5f, random.nextInt(Renderer.RESOLUTION_Y) + 0.5f);
+				break;
+		}
 	}
 
 	@Override
 	public void onSurfaceCreated(GL10 unused, EGLConfig config)
 	{
-		GLES20.glClearColor(1f, 0f, 0f, 1f);
+		GLES20.glEnable(GLES20.GL_BLEND);
+		GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+		GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+		
+		GLES20.glClearColor(1f, 1f, 1f, 1f);
 
 		String vertexShaderSource = TextResourceReader.readTextFileFromResource(this.context, R.raw.vertex_shader);
 		String fragmentShaderSource = TextResourceReader.readTextFileFromResource(this.context, R.raw.fragment_shader);
@@ -119,20 +141,10 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		this.colorLocation = GLES20.glGetUniformLocation(this.program, Renderer.U_COLOR);
 		this.positionLocation = GLES20.glGetAttribLocation(this.program, Renderer.A_POSITION);
 		
-		createSquare();
-
-		// gl.glEnable(GL10.GL_BLEND);
-		// gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-		// gl.glEnable(GL10.GL_DEPTH_TEST);
-		// gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		// gl.glEnable(GL10.GL_ALPHA_BITS);
-		// gl.glEnable(GL10.GL_MULTISAMPLE);
-		// gl.glEnable(GL10.GL_SMOOTH);
-		// gl.glShadeModel(GL10.GL_SMOOTH);
-		// gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
-		// gl.glHint(GL10.GL_POLYGON_SMOOTH_HINT, GL10.GL_NICEST);
-		// gl.glHint(GL10.GL_LINE_SMOOTH_HINT, GL10.GL_NICEST);
-		// gl.glHint(GL10.GL_POINT_SMOOTH_HINT, GL10.GL_NICEST);
+		createSquare(Square.Type.UP);
+		createSquare(Square.Type.DOWN);
+		createSquare(Square.Type.LEFT);
+		createSquare(Square.Type.RIGHT);
 	}
 	
 	@Override
@@ -146,8 +158,6 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		// float aspectRatio = this.width > this.height ? (float)this.width / (float)this.height :
 		// (float)this.height / (float)this.width;
 
-		// Matrix.orthoM(this.projectionMatrix, 0, -Renderer.RESOLUTION_X / 2, Renderer.RESOLUTION_X / 2,
-		// -(Renderer.RESOLUTION_Y / 2), (Renderer.RESOLUTION_Y / 2), -1f, 1f);
 		Matrix.orthoM(this.projectionMatrix, 0, 0, Renderer.RESOLUTION_X, 0, Renderer.RESOLUTION_Y, -1f, 1f);
 	}
 	
@@ -157,6 +167,9 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 		GLES20.glUniformMatrix4fv(this.matrixLocation, 1, false, this.projectionMatrix, 0);
 		
-		this.square.draw();
+		this.squareUp.draw();
+		this.squareDown.draw();
+		this.squareLeft.draw();
+		this.squareRight.draw();
 	}
 }
