@@ -18,12 +18,12 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
+		setContentView(R.layout.activity_main);
+		
 		this.renderer = new Renderer(this);
 
-		this.surfaceView = new GLSurfaceView(this);
-		this.surfaceView.setEGLContextClientVersion(2);
+		this.surfaceView = (GLSurfaceView)findViewById(R.id.glSurface);
 		this.surfaceView.setRenderer(this.renderer);
-		setContentView(this.surfaceView);
 
 		this.surfaceView.setOnTouchListener(new OnSwipeListener(this)
 		{

@@ -19,8 +19,7 @@ public abstract class OnSwipeListener implements OnTouchListener
 
 	private final class GestureListener extends SimpleOnGestureListener
 	{
-		private static final int SWIPE_THRESHOLD = 50;
-		private static final int SWIPE_VELOCITY_THRESHOLD = 50;
+		private static final int SWIPE_THRESHOLD = 20;
 
 		@Override
 		public boolean onDown(MotionEvent event)
@@ -40,7 +39,7 @@ public abstract class OnSwipeListener implements OnTouchListener
 
 				if (Math.abs(diffX) > Math.abs(diffY))
 				{
-					if ((Math.abs(diffX) > GestureListener.SWIPE_THRESHOLD) && (Math.abs(velocityX) > GestureListener.SWIPE_VELOCITY_THRESHOLD))
+					if (Math.abs(diffX) > GestureListener.SWIPE_THRESHOLD)
 					{
 						if (diffX > 0)
 						{
@@ -55,7 +54,7 @@ public abstract class OnSwipeListener implements OnTouchListener
 				}
 				else if (Math.abs(diffY) > Math.abs(diffX))
 				{
-					if ((Math.abs(diffY) > GestureListener.SWIPE_THRESHOLD) && (Math.abs(velocityY) > GestureListener.SWIPE_VELOCITY_THRESHOLD))
+					if (Math.abs(diffY) > GestureListener.SWIPE_THRESHOLD)
 					{
 						if (diffY > 0)
 						{
