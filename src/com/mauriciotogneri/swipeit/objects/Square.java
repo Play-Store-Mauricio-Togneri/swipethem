@@ -8,6 +8,8 @@ import android.opengl.GLES20;
 
 public class Square
 {
+	private final float x;
+	private final float y;
 	private final int color;
 
 	private final int positionLocation;
@@ -21,22 +23,22 @@ public class Square
 	
 	private static final int STRIDE = Square.POSITION_COMPONENT_COUNT * Square.BYTES_PER_FLOAT;
 
-	private static final int SQUARE_SIZE = 1;
+	private static final float SQUARE_SIDE = 0.5f;
 	
 	public Square(int positionLocation, int colorLocation, int color, float x, float y)
 	{
 		this.positionLocation = positionLocation;
 		this.colorLocation = colorLocation;
 		this.color = color;
+		this.x = x;
+		this.y = y;
 
-		float halfSide = Square.SQUARE_SIZE / 2f;
-		
 		float[] vertices = new float[]
 			{
-				x - halfSide, y + halfSide, //
-				x - halfSide, y - halfSide, //
-				x + halfSide, y + halfSide, //
-				x + halfSide, y - halfSide
+				x - Square.SQUARE_SIDE, y + Square.SQUARE_SIDE, //
+				x - Square.SQUARE_SIDE, y - Square.SQUARE_SIDE, //
+				x + Square.SQUARE_SIDE, y + Square.SQUARE_SIDE, //
+				x + Square.SQUARE_SIDE, y - Square.SQUARE_SIDE
 			};
 		
 		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(vertices.length * Square.BYTES_PER_FLOAT);
@@ -44,6 +46,11 @@ public class Square
 		this.vertexData = byteBuffer.asFloatBuffer();
 		this.vertexData.put(vertices);
 		
+	}
+	
+	public boolean isInside(float x, float y)
+	{
+		return (x >= (this.x - Square.SQUARE_SIDE)) && (x <= (this.x + Square.SQUARE_SIDE)) && (y >= (this.y - Square.SQUARE_SIDE)) && (y <= (this.y + Square.SQUARE_SIDE));
 	}
 	
 	public void draw()
