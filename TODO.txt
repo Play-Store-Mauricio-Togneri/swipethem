@@ -1,0 +1,21 @@
+Correct:
+	1 tap
+	2 taps
+	3 taps
+	4 taps
+	Swipe up
+	Swipe down
+	Swipe left
+	Swipe right
+	hold?
+
+Incorrect:
+	wait too much to remove a tile (timeout)
+	press in a mine
+	incorrect gesture on a tile
+	fail to defuse the bomb (hold it for X seconds to defuse correctly)
+	
+Modes:
+	classic (3 lives)
+	time trial
+	blind (no colors)
