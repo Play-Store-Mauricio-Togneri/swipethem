@@ -1,13 +1,13 @@
 Correct:
-	1 tap
-	2 taps
-	3 taps
-	4 taps
 	Swipe up
 	Swipe down
 	Swipe left
 	Swipe right
-	hold?
+	1 tap
+	2 taps
+	3 taps
+	4 taps
+	hold X seconds
 
 Incorrect:
 	wait too much to remove a tile (timeout)
@@ -17,5 +17,8 @@ Incorrect:
 	
 Modes:
 	classic (3 lives)
-	time trial
-	blind (no colors)
+	time trial (60 seconds - failure removes one second)
+	blind (no tile indication)
+	
+Select map size:
+	7x11

@@ -7,8 +7,8 @@
     <bool name="ga_autoActivityTracking">true</bool>
     <bool name="ga_reportUncaughtExceptions">true</bool>
 
-    <screenName name="com.mauriciotogneri.countdown.MainActivity">Main Activity</screenName>
+    <screenName name="com.mauriciotogneri.swipeit.MainActivity">Main Activity</screenName>
     
-    <string name="ga_trackingId">UA-54738104-2</string>
+    <string name="ga_trackingId">UA-XXXXXXXX-2</string>
     
 </resources>

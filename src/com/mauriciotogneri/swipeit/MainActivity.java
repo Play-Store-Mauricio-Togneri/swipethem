@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.WindowManager;
-import com.mauriciotogneri.swipeit.gesture.OnSwipeListener;
+import com.mauriciotogneri.swipeit.gesture.GestureManager;
 import com.mauriciotogneri.swipeit.ui.Renderer;
 
 public class MainActivity extends Activity
@@ -24,9 +24,15 @@ public class MainActivity extends Activity
 
 		this.surfaceView = (GLSurfaceView)findViewById(R.id.glSurface);
 		this.surfaceView.setRenderer(this.renderer);
-
-		this.surfaceView.setOnTouchListener(new OnSwipeListener(this)
+		
+		this.surfaceView.setOnTouchListener(new GestureManager()
 		{
+			@Override
+			public void onTap(float x, float y)
+			{
+				MainActivity.this.renderer.onTap(x, y);
+			}
+			
 			@Override
 			public void onSwipeUp(float x, float y)
 			{
@@ -38,19 +44,46 @@ public class MainActivity extends Activity
 			{
 				MainActivity.this.renderer.onSwipeDown(x, y);
 			}
-
+			
 			@Override
 			public void onSwipeLeft(float x, float y)
 			{
 				MainActivity.this.renderer.onSwipeLeft(x, y);
 			}
-
+			
 			@Override
 			public void onSwipeRight(float x, float y)
 			{
 				MainActivity.this.renderer.onSwipeRight(x, y);
 			}
 		});
+
+		// this.surfaceView.setOnTouchListener(new OnSwipeListener(this)
+		// {
+		// @Override
+		// public void onSwipeUp(float x, float y)
+		// {
+		// MainActivity.this.renderer.onSwipeUp(x, y);
+		// }
+		//
+		// @Override
+		// public void onSwipeDown(float x, float y)
+		// {
+		// MainActivity.this.renderer.onSwipeDown(x, y);
+		// }
+		//
+		// @Override
+		// public void onSwipeLeft(float x, float y)
+		// {
+		// MainActivity.this.renderer.onSwipeLeft(x, y);
+		// }
+		//
+		// @Override
+		// public void onSwipeRight(float x, float y)
+		// {
+		// MainActivity.this.renderer.onSwipeRight(x, y);
+		// }
+		// });
 	}
 
 	@Override
