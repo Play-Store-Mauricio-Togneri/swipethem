@@ -4,16 +4,6 @@ import android.opengl.GLES20;
 
 public class ShaderHelper
 {
-	public static int compileVertexShader(String shaderCode)
-	{
-		return ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, shaderCode);
-	}
-	
-	public static int compileFragmentShader(String shaderCode)
-	{
-		return ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, shaderCode);
-	}
-	
 	private static int compileShader(int type, String shaderCode)
 	{
 		// Create a new shader object.
@@ -42,8 +32,11 @@ public class ShaderHelper
 		return shaderObjectId;
 	}
 	
-	public static int linkProgram(int vertexShaderId, int fragmentShaderId)
+	public static int linkProgram(String vertexShader, String fragmentShader)
 	{
+		int vertexShaderId = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);
+		int fragmentShaderId = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);
+		
 		// Create a new program object.
 		final int programObjectId = GLES20.glCreateProgram();
 
@@ -69,15 +62,5 @@ public class ShaderHelper
 		
 		// Return the program object ID.
 		return programObjectId;
-	}
-
-	public static boolean validateProgram(int programObjectId)
-	{
-		GLES20.glValidateProgram(programObjectId);
-		
-		final int[] validateStatus = new int[1];
-		GLES20.glGetProgramiv(programObjectId, GLES20.GL_VALIDATE_STATUS, validateStatus, 0);
-
-		return (validateStatus[0] != 0);
 	}
 }

@@ -1,103 +1,110 @@
 package com.mauriciotogneri.swipeit.objects;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import com.mauriciotogneri.swipeit.objects.Square.Type;
+import com.mauriciotogneri.swipeit.objects.Tile.Type;
 
 public class Game
 {
-	public static final int RESOLUTION_X = 7;
-	public static final int RESOLUTION_Y = 11;
-
-	private final Renderer renderer;
-
-	private Square squareUp;
-	private Square squareDown;
-	private Square squareLeft;
-	private Square squareRight;
+	public static final int RESOLUTION_X = 5;
+	public static final int RESOLUTION_Y = 8;
 	
+	private final Renderer renderer;
+	
+	private final List<Tile> tiles = new ArrayList<Tile>();
+
 	public Game(Context context, GLSurfaceView surfaceView)
 	{
 		this.renderer = new Renderer(context, this, surfaceView);
 		
-		createSquare(Square.Type.UP);
-		createSquare(Square.Type.DOWN);
-		createSquare(Square.Type.LEFT);
-		createSquare(Square.Type.RIGHT);
+		Random random = new Random();
+		
+		for (int i = 0; i < Game.RESOLUTION_X; i++)
+		{
+			for (int j = 0; j < Game.RESOLUTION_Y; j++)
+			{
+				Tile tile = createTile(Type.values()[random.nextInt(Type.values().length)], i, j);
+				this.tiles.add(tile);
+			}
+		}
 	}
-
+	
 	public Renderer getRenderer()
 	{
 		return this.renderer;
 	}
-
+	
 	public void onTap(float x, float y)
 	{
-		// if (this.squareUp.isInside(x, y))
+		// if (this.tileUp.isInside(x, y))
 		// {
-		// createSquare(Square.Type.UP);
+		// createTile(Tile.Type.UP);
 		// }
 	}
-	
+
 	public void onSwipeUp(float x, float y)
 	{
-		if (this.squareUp.isInside(x, y))
-		{
-			createSquare(Square.Type.UP);
-		}
+		// if (this.tileUp.isInside(x, y))
+		// {
+		// createTile(Tile.Type.UP);
+		// }
 	}
-	
+
 	public void onSwipeDown(float x, float y)
 	{
-		if (this.squareDown.isInside(x, y))
-		{
-			createSquare(Square.Type.DOWN);
-		}
+		// if (this.tileDown.isInside(x, y))
+		// {
+		// createTile(Tile.Type.DOWN);
+		// }
 	}
-	
+
 	public void onSwipeLeft(float x, float y)
 	{
-		if (this.squareLeft.isInside(x, y))
-		{
-			createSquare(Square.Type.LEFT);
-		}
+		// if (this.tileLeft.isInside(x, y))
+		// {
+		// createTile(Tile.Type.LEFT);
+		// }
 	}
-	
+
 	public void onSwipeRight(float x, float y)
 	{
-		if (this.squareRight.isInside(x, y))
-		{
-			createSquare(Square.Type.RIGHT);
-		}
+		// if (this.tileRight.isInside(x, y))
+		// {
+		// createTile(Tile.Type.RIGHT);
+		// }
 	}
-	
-	private void createSquare(Type type)
-	{
-		Random random = new Random();
 
+	private Tile createTile(Type type, int x, int y)
+	{
+		Tile result = null;
+		
 		switch (type)
 		{
 			case UP:
-				this.squareUp = new Square(Type.UP, random.nextInt(Game.RESOLUTION_X) + 0.5f, random.nextInt(Game.RESOLUTION_Y) + 0.5f);
+				result = new Tile(Type.UP, x + Tile.BLOCK_SIDE, y + Tile.BLOCK_SIDE);
 				break;
 			case DOWN:
-				this.squareDown = new Square(Type.DOWN, random.nextInt(Game.RESOLUTION_X) + 0.5f, random.nextInt(Game.RESOLUTION_Y) + 0.5f);
+				result = new Tile(Type.DOWN, x + Tile.BLOCK_SIDE, y + Tile.BLOCK_SIDE);
 				break;
 			case LEFT:
-				this.squareLeft = new Square(Type.LEFT, random.nextInt(Game.RESOLUTION_X) + 0.5f, random.nextInt(Game.RESOLUTION_Y) + 0.5f);
+				result = new Tile(Type.LEFT, x + Tile.BLOCK_SIDE, y + Tile.BLOCK_SIDE);
 				break;
 			case RIGHT:
-				this.squareRight = new Square(Type.RIGHT, random.nextInt(Game.RESOLUTION_X) + 0.5f, random.nextInt(Game.RESOLUTION_Y) + 0.5f);
+				result = new Tile(Type.RIGHT, x + Tile.BLOCK_SIDE, y + Tile.BLOCK_SIDE);
 				break;
 		}
+
+		return result;
 	}
-	
+
 	public void draw(int positionLocation, int colorLocation)
 	{
-		this.squareUp.draw(positionLocation, colorLocation);
-		this.squareDown.draw(positionLocation, colorLocation);
-		this.squareLeft.draw(positionLocation, colorLocation);
-		this.squareRight.draw(positionLocation, colorLocation);
+		for (Tile tile : this.tiles)
+		{
+			tile.draw(positionLocation, colorLocation);
+		}
 	}
 }
