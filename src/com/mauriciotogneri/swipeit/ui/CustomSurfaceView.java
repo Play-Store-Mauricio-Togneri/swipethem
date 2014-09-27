@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.View;
+import com.mauriciotogneri.swipeit.objects.Game;
 
 public class CustomSurfaceView extends GLSurfaceView
 {
@@ -21,7 +22,7 @@ public class CustomSurfaceView extends GLSurfaceView
 		int height = View.MeasureSpec.getSize(heightMeasureSpec);
 		
 		float screenRatio = (float)height / (float)width;
-		float resolutionRatio = (float)com.mauriciotogneri.swipeit.ui.Renderer.RESOLUTION_Y / (float)com.mauriciotogneri.swipeit.ui.Renderer.RESOLUTION_X;
+		float resolutionRatio = (float)Game.RESOLUTION_Y / (float)Game.RESOLUTION_X;
 		
 		if (screenRatio > resolutionRatio)
 		{
