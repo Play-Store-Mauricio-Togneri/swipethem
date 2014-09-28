@@ -13,12 +13,12 @@ public class Game
 	public static final int RESOLUTION_X = 4;
 	public static final int RESOLUTION_Y = 6;
 	private static final int MAX_NUMBER_OF_TILES = Game.RESOLUTION_X * Game.RESOLUTION_Y;
-	private static final int DIFFICULTY_LIMIT = 3;
+	private static final int DIFFICULTY_LIMIT = 10;
 
 	private final MainActivity activity;
 	private final Renderer renderer;
 
-	private int lives = 3;
+	private float time = 60;
 	private int score = 0;
 	private int difficultyCounter = 0;
 
@@ -30,18 +30,18 @@ public class Game
 		this.renderer = new Renderer(activity, this, surfaceView);
 
 		createNewTile();
-		setScore();
-		setLives();
+		updateScore();
+		updateTimer();
 	}
 
-	public void setScore()
+	public void updateScore()
 	{
-		this.activity.setScore(this.score);
+		this.activity.updateScore(this.score);
 	}
 	
-	public void setLives()
+	public void updateTimer()
 	{
-		this.activity.setLives(this.lives);
+		this.activity.updateTimer((int)this.time);
 	}
 
 	public Renderer getRenderer()
@@ -125,6 +125,9 @@ public class Game
 	
 	public void update(float delta, int positionLocation, int colorLocation, InputEvent input)
 	{
+		this.time -= delta;
+		updateTimer();
+
 		processInput(input);
 		
 		for (Tile tile : this.tiles)
@@ -143,13 +146,13 @@ public class Game
 			{
 				if (tile.accepts(input.type))
 				{
+					this.tiles.remove(tile);
+					createNewTile();
+					
 					if (tile.disables(input.type))
 					{
-						this.tiles.remove(tile);
-						createNewTile();
-
 						this.score++;
-						setScore();
+						updateScore();
 
 						this.difficultyCounter++;
 
@@ -162,11 +165,12 @@ public class Game
 								createNewTile();
 							}
 						}
+
+						// TODO: GOOD SOUND
 					}
 					else
 					{
-						this.lives--;
-						setLives();
+						// TODO: BAD SOUND
 					}
 				}
 			}

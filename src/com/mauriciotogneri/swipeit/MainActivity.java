@@ -1,11 +1,10 @@
 package com.mauriciotogneri.swipeit;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.TextView;
 import com.mauriciotogneri.swipeit.objects.Game;
 
@@ -27,7 +26,7 @@ public class MainActivity extends Activity
 		
 	}
 
-	public void setScore(final int score)
+	public void updateScore(final int score)
 	{
 		runOnUiThread(new Runnable()
 		{
@@ -40,24 +39,46 @@ public class MainActivity extends Activity
 		});
 	}
 	
-	public void setLives(final int lives)
+	public void updateTimer(final int time)
 	{
 		runOnUiThread(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				ImageView life1 = (ImageView)findViewById(R.id.life1);
-				life1.setVisibility((lives > 0) ? View.VISIBLE : View.GONE);
+				TextView timeView = (TextView)findViewById(R.id.timer);
 
-				ImageView life2 = (ImageView)findViewById(R.id.life2);
-				life2.setVisibility((lives > 1) ? View.VISIBLE : View.GONE);
-
-				ImageView life3 = (ImageView)findViewById(R.id.life3);
-				life3.setVisibility((lives > 2) ? View.VISIBLE : View.GONE);
+				if (time > 9)
+				{
+					timeView.setText(String.valueOf(time));
+				}
+				else
+				{
+					timeView.setTextColor(Color.RED);
+					timeView.setText("0" + time);
+				}
 			}
 		});
 	}
+	
+	// public void setLives(final int lives)
+	// {
+	// runOnUiThread(new Runnable()
+	// {
+	// @Override
+	// public void run()
+	// {
+	// ImageView life1 = (ImageView)findViewById(R.id.life1);
+	// life1.setVisibility((lives > 0) ? View.VISIBLE : View.GONE);
+	//
+	// ImageView life2 = (ImageView)findViewById(R.id.life2);
+	// life2.setVisibility((lives > 1) ? View.VISIBLE : View.GONE);
+	//
+	// ImageView life3 = (ImageView)findViewById(R.id.life3);
+	// life3.setVisibility((lives > 2) ? View.VISIBLE : View.GONE);
+	// }
+	// });
+	// }
 	
 	@Override
 	protected void onResume()
