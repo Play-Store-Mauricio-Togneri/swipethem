@@ -8,16 +8,19 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import com.mauriciotogneri.swipeit.R;
 import com.mauriciotogneri.swipeit.input.GestureManager;
-import com.mauriciotogneri.swipeit.input.Movement;
+import com.mauriciotogneri.swipeit.input.InputEvent;
 import com.mauriciotogneri.swipeit.util.ShaderHelper;
 import com.mauriciotogneri.swipeit.util.TextResourceReader;
 
 public class Renderer implements android.opengl.GLSurfaceView.Renderer
 {
 	private final Game game;
+	private final GLSurfaceView surfaceView;
 	
 	private int width = 0;
 	private int height = 0;
+	
+	private long startTime;
 	
 	private static final String U_MATRIX = "u_Matrix";
 	private static final String U_COLOR = "u_Color";
@@ -32,53 +35,71 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 	private int positionLocation;
 	private int colorLocation;
 	
-	private final Object lock = new Object();
-	private Movement movement = null;
+	private final Object inputLock = new Object();
+	private final InputEvent lastInput = new InputEvent();
+	
+	// state
+	private RendererStatus state = null;
+	private final Object stateChangedLock = new Object();
+
+	// engine status
+	private enum RendererStatus
+	{
+		RUNNING, IDLE, PAUSED, FINISHED
+	}
 
 	public Renderer(Context context, final Game game, GLSurfaceView surfaceView)
 	{
 		this.context = context;
 		this.game = game;
+		this.surfaceView = surfaceView;
+		this.startTime = System.nanoTime();
 		
 		surfaceView.setOnTouchListener(new GestureManager()
 		{
 			@Override
-			public void onTap(float x, float y)
+			public void onTapDown(float x, float y)
 			{
-				setMovement(new Movement(Movement.Type.TAP, getScreenX(x), getScreenY(y)));
+				setInput(InputEvent.Type.TAP_DOWN, getScreenX(x), getScreenY(y));
+			}
+			
+			@Override
+			public void onTapUp(float x, float y)
+			{
+				setInput(InputEvent.Type.TAP_UP, getScreenX(x), getScreenY(y));
 			}
 			
 			@Override
 			public void onSwipeUp(float x, float y)
 			{
-				setMovement(new Movement(Movement.Type.SWIPE_UP, getScreenX(x), getScreenY(y)));
+				setInput(InputEvent.Type.SWIPE_UP, getScreenX(x), getScreenY(y));
 			}
 			
 			@Override
 			public void onSwipeDown(float x, float y)
 			{
-				setMovement(new Movement(Movement.Type.SWIPE_DOWN, getScreenX(x), getScreenY(y)));
+				setInput(InputEvent.Type.SWIPE_DOWN, getScreenX(x), getScreenY(y));
 			}
 
 			@Override
 			public void onSwipeLeft(float x, float y)
 			{
-				setMovement(new Movement(Movement.Type.SWIPE_LEFT, getScreenX(x), getScreenY(y)));
+				setInput(InputEvent.Type.SWIPE_LEFT, getScreenX(x), getScreenY(y));
 			}
 
 			@Override
 			public void onSwipeRight(float x, float y)
 			{
-				setMovement(new Movement(Movement.Type.SWIPE_RIGHT, getScreenX(x), getScreenY(y)));
+				setInput(InputEvent.Type.SWIPE_RIGHT, getScreenX(x), getScreenY(y));
 			}
 		});
 	}
 
-	private void setMovement(Movement movement)
+	private void setInput(InputEvent.Type type, float x, float y)
 	{
-		synchronized (this.lock)
+		synchronized (this.inputLock)
 		{
-			this.movement = movement;
+			this.lastInput.set(type, x, y);
 		}
 	}
 
@@ -122,18 +143,97 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		GLES20.glViewport(0, 0, width, height);
 
 		Matrix.orthoM(this.projectionMatrix, 0, 0, Game.RESOLUTION_X, 0, Game.RESOLUTION_Y, -1f, 1f);
+		
+		synchronized (this.stateChangedLock)
+		{
+			this.state = RendererStatus.RUNNING;
+		}
+
+		// TODO: reload textures
+	}
+
+	private void update(float delta)
+	{
+		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+		GLES20.glUniformMatrix4fv(this.matrixLocation, 1, false, this.projectionMatrix, 0);
+		
+		synchronized (this.inputLock)
+		{
+			this.game.update(delta, this.positionLocation, this.colorLocation, this.lastInput);
+			this.lastInput.clear();
+		}
 	}
 	
 	@Override
 	public void onDrawFrame(GL10 unused)
 	{
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-		GLES20.glUniformMatrix4fv(this.matrixLocation, 1, false, this.projectionMatrix, 0);
+		RendererStatus status = null;
 		
-		synchronized (this.lock)
+		synchronized (this.stateChangedLock)
 		{
-			this.game.update(this.positionLocation, this.colorLocation, this.movement);
-			this.movement = null;
+			status = this.state;
+		}
+		
+		if (status == RendererStatus.RUNNING)
+		{
+			long currentTime = System.nanoTime();
+			float delta = (currentTime - this.startTime) / 1000000000f;
+			this.startTime = currentTime;
+			
+			// FPS.log(currentTime);
+			
+			update(delta);
+		}
+		else if ((status == RendererStatus.PAUSED) || (status == RendererStatus.FINISHED))
+		{
+			synchronized (this.stateChangedLock)
+			{
+				this.state = RendererStatus.IDLE;
+				this.stateChangedLock.notifyAll();
+			}
+		}
+	}
+	
+	public void pause(boolean finishing)
+	{
+		synchronized (this.stateChangedLock)
+		{
+			if (this.state == RendererStatus.RUNNING)
+			{
+				if (finishing)
+				{
+					this.state = RendererStatus.FINISHED;
+				}
+				else
+				{
+					this.state = RendererStatus.PAUSED;
+				}
+				
+				while (true)
+				{
+					try
+					{
+						this.stateChangedLock.wait();
+						break;
+					}
+					catch (Exception e)
+					{
+					}
+				}
+			}
+
+			if (this.surfaceView != null)
+			{
+				this.surfaceView.onPause();
+			}
+		}
+	}
+
+	public void resume()
+	{
+		if (this.surfaceView != null)
+		{
+			this.surfaceView.onResume();
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package com.mauriciotogneri.swipeit.objects;
 
 import android.graphics.Color;
-import com.mauriciotogneri.swipeit.input.Movement;
+import com.mauriciotogneri.swipeit.input.InputEvent;
 import com.mauriciotogneri.swipeit.shapes.Arrow;
 import com.mauriciotogneri.swipeit.shapes.ArrowDown;
 import com.mauriciotogneri.swipeit.shapes.ArrowLeft;
@@ -75,7 +75,7 @@ public class Tile
 		return (x >= (this.x - Tile.BLOCK_SIDE)) && (x <= (this.x + Tile.BLOCK_SIDE)) && (y >= (this.y - Tile.BLOCK_SIDE)) && (y <= (this.y + Tile.BLOCK_SIDE));
 	}
 
-	public boolean isType(Movement.Type type)
+	public boolean isType(InputEvent.Type type)
 	{
 		return true;// (this.type == type);
 	}

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import com.mauriciotogneri.swipeit.input.Movement;
+import com.mauriciotogneri.swipeit.input.InputEvent;
 import com.mauriciotogneri.swipeit.objects.Tile.Type;
 
 public class Game
@@ -129,9 +129,9 @@ public class Game
 		return result;
 	}
 	
-	public void update(int positionLocation, int colorLocation, Movement movement)
+	public void update(float delta, int positionLocation, int colorLocation, InputEvent input)
 	{
-		processInput(movement);
+		processInput(input);
 		
 		for (Tile tile : this.tiles)
 		{
@@ -139,16 +139,32 @@ public class Game
 		}
 	}
 	
-	private void processInput(Movement movement)
+	private void processInput(InputEvent input)
 	{
-		if (movement != null)
+		if (input.isValid())
 		{
-			Tile tile = getTile(movement.x, movement.y);
+			Tile tile = getTile(input.x, input.y);
 
-			if ((tile != null) && tile.isType(movement.type))
+			if ((tile != null) && tile.isType(input.type))
 			{
 				this.tiles.remove(tile);
 			}
+		}
+	}
+	
+	public void resume()
+	{
+		if (this.renderer != null)
+		{
+			this.renderer.resume();
+		}
+	}
+	
+	public void pause(boolean finishing)
+	{
+		if (this.renderer != null)
+		{
+			this.renderer.pause(finishing);
 		}
 	}
 }

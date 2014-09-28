@@ -38,6 +38,7 @@ public abstract class GestureManager implements OnTouchListener
 					this.lastX2 = x;
 					this.lastY2 = y;
 				}
+				onTapDown(x, y);
 				break;
 
 			case MotionEvent.ACTION_UP: // 1
@@ -94,11 +95,13 @@ public abstract class GestureManager implements OnTouchListener
 		}
 		else
 		{
-			onTap(lastX, lastY);
+			onTapUp(lastX, lastY);
 		}
 	}
 	
-	public abstract void onTap(float x, float y);
+	public abstract void onTapDown(float x, float y);
+	
+	public abstract void onTapUp(float x, float y);
 	
 	public abstract void onSwipeRight(float x, float y);
 

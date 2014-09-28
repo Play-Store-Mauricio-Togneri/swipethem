@@ -8,33 +8,40 @@ import com.mauriciotogneri.swipeit.objects.Game;
 
 public class MainActivity extends Activity
 {
-	private GLSurfaceView surfaceView;
 	private Game game;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		
-		setContentView(R.layout.activity_main);
-		
-		this.surfaceView = (GLSurfaceView)findViewById(R.id.glSurface);
-		this.game = new Game(this, this.surfaceView);
-		this.surfaceView.setRenderer(this.game.getRenderer());
-	}
 
-	@Override
-	protected void onPause()
-	{
-		super.onPause();
-		this.surfaceView.onPause();
+		setContentView(R.layout.activity_main);
+
+		GLSurfaceView surfaceView = (GLSurfaceView)findViewById(R.id.glSurface);
+		this.game = new Game(this, surfaceView);
+		surfaceView.setRenderer(this.game.getRenderer());
 	}
 
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		this.surfaceView.onResume();
+
+		if (this.game != null)
+		{
+			this.game.resume();
+		}
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+
+		if (this.game != null)
+		{
+			this.game.pause(isFinishing());
+		}
 	}
 }
