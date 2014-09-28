@@ -3,6 +3,7 @@ package com.mauriciotogneri.swipeit.objects;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import com.mauriciotogneri.swipeit.MainActivity;
 import com.mauriciotogneri.swipeit.audio.AudioManager;
@@ -16,6 +17,9 @@ public class Game
 	private static final int MAX_NUMBER_OF_TILES = Game.RESOLUTION_X * Game.RESOLUTION_Y;
 	private static final int DIFFICULTY_LIMIT = 10;
 	private static final int TOTAL_TIME = 60;
+	
+	private static final int COLOR_NORMAL = Color.argb(255, 85, 85, 85);
+	private static final int COLOR_WARNING = Color.argb(255, 255, 60, 60);
 
 	private final MainActivity activity;
 	private final Renderer renderer;
@@ -45,7 +49,7 @@ public class Game
 	
 	public void updateTimer()
 	{
-		this.activity.updateTimer((int)this.time);
+		this.activity.updateTimer((int)this.time, (this.time > 9) ? Game.COLOR_NORMAL : Game.COLOR_WARNING);
 		
 		if ((this.time < 1) && (!this.finished))
 		{
