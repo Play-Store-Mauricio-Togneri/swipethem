@@ -1,7 +1,7 @@
 package com.mauriciotogneri.swipeit.objects;
 
 import android.graphics.Color;
-import com.mauriciotogneri.swipeit.input.InputEvent;
+import com.mauriciotogneri.swipeit.input.InputEvent.InputType;
 import com.mauriciotogneri.swipeit.shapes.Arrow;
 import com.mauriciotogneri.swipeit.shapes.ArrowDown;
 import com.mauriciotogneri.swipeit.shapes.ArrowLeft;
@@ -11,7 +11,7 @@ import com.mauriciotogneri.swipeit.shapes.Square;
 
 public class Tile
 {
-	private final Type type;
+	private final TileType type;
 	
 	private final int i;
 	private final int j;
@@ -22,20 +22,22 @@ public class Tile
 	public static final float BLOCK_SIDE = 0.5f;
 	private static final float TILE_SIDE = Tile.BLOCK_SIDE * 0.75f;
 	
-	public enum Type
+	public enum TileType
 	{
-		UP(Color.argb(255, 60, 170, 230), InputEvent.Type.SWIPE_UP), //
-		DOWN(Color.argb(255, 255, 60, 60), InputEvent.Type.SWIPE_DOWN), //
-		LEFT(Color.argb(255, 255, 200, 40), InputEvent.Type.SWIPE_LEFT), //
-		RIGHT(Color.argb(255, 100, 200, 100), InputEvent.Type.SWIPE_RIGHT); //
+		UP(Color.argb(255, 60, 170, 230), InputType.SWIPE_UP, InputType.SWIPE_UP, InputType.SWIPE_DOWN, InputType.SWIPE_LEFT, InputType.SWIPE_RIGHT, InputType.TAP_UP), //
+		DOWN(Color.argb(255, 255, 60, 60), InputType.SWIPE_DOWN, InputType.SWIPE_UP, InputType.SWIPE_DOWN, InputType.SWIPE_LEFT, InputType.SWIPE_RIGHT, InputType.TAP_UP), //
+		LEFT(Color.argb(255, 255, 200, 40), InputType.SWIPE_LEFT, InputType.SWIPE_UP, InputType.SWIPE_DOWN, InputType.SWIPE_LEFT, InputType.SWIPE_RIGHT, InputType.TAP_UP), //
+		RIGHT(Color.argb(255, 100, 200, 100), InputType.SWIPE_RIGHT, InputType.SWIPE_UP, InputType.SWIPE_DOWN, InputType.SWIPE_LEFT, InputType.SWIPE_RIGHT, InputType.TAP_UP); //
 		
 		private int color;
-		private InputEvent.Type input;
+		private InputType inputValid;
+		private InputType[] inputInvalid;
 		
-		private Type(int color, InputEvent.Type input)
+		private TileType(int color, InputType inputValid, InputType... inputInvalid)
 		{
 			this.color = color;
-			this.input = input;
+			this.inputValid = inputValid;
+			this.inputInvalid = inputInvalid;
 		}
 		
 		public int getColor()
@@ -43,13 +45,29 @@ public class Tile
 			return this.color;
 		}
 		
-		public boolean disables(InputEvent.Type input)
+		public boolean disables(InputType input)
 		{
-			return (this.input == input);
+			return (this.inputValid == input);
+		}
+		
+		public boolean accepts(InputType input)
+		{
+			boolean result = false;
+			
+			for (InputType type : this.inputInvalid)
+			{
+				if (type == input)
+				{
+					result = true;
+					break;
+				}
+			}
+
+			return result;
 		}
 	}
 	
-	public Tile(Type type, int i, int j)
+	public Tile(TileType type, int i, int j)
 	{
 		this.type = type;
 
@@ -86,9 +104,14 @@ public class Tile
 		return (i == this.i) && (j == this.j);
 	}
 	
-	public boolean disables(InputEvent.Type input)
+	public boolean disables(InputType input)
 	{
 		return this.type.disables(input);
+	}
+	
+	public boolean accepts(InputType input)
+	{
+		return this.type.accepts(input);
 	}
 	
 	public void draw(int positionLocation, int colorLocation)
