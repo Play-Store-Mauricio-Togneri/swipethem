@@ -8,22 +8,22 @@ public abstract class GestureManager implements OnTouchListener
 {
 	private float lastX1 = 0;
 	private float lastY1 = 0;
-
+	
 	private float lastX2 = 0;
 	private float lastY2 = 0;
-	
-	private static final int SWIPE_THRESHOLD = 20;
 
+	private static final int SWIPE_THRESHOLD = 20;
+	
 	@Override
 	public boolean onTouch(View view, MotionEvent event)
 	{
 		int action = event.getAction();
 		int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 		int pointerId = event.getPointerId(pointerIndex);
-
+		
 		float x = event.getX(pointerIndex);
 		float y = event.getY(pointerIndex);
-		
+
 		switch (action & MotionEvent.ACTION_MASK)
 		{
 			case MotionEvent.ACTION_DOWN: // 0
@@ -40,7 +40,7 @@ public abstract class GestureManager implements OnTouchListener
 				}
 				onTapDown(x, y);
 				break;
-
+			
 			case MotionEvent.ACTION_UP: // 1
 			case MotionEvent.ACTION_POINTER_UP: // 6
 				if (pointerId == 0)
@@ -53,16 +53,16 @@ public abstract class GestureManager implements OnTouchListener
 				}
 				break;
 		}
-		
+
 		return true;
 	}
-
+	
 	private void process(float x, float y, float lastX, float lastY)
 	{
 		float diffX = x - lastX;
 		float diffY = y - lastY;
-
-		if ((Math.abs(diffX) > 1) && (Math.abs(diffY) > 1))
+		
+		if ((Math.abs(diffX) > 1) || (Math.abs(diffY) > 1))
 		{
 			if (Math.abs(diffX) > Math.abs(diffY))
 			{
@@ -98,16 +98,16 @@ public abstract class GestureManager implements OnTouchListener
 			onTapUp(lastX, lastY);
 		}
 	}
-	
+
 	public abstract void onTapDown(float x, float y);
-	
+
 	public abstract void onTapUp(float x, float y);
-	
+
 	public abstract void onSwipeRight(float x, float y);
-
+	
 	public abstract void onSwipeLeft(float x, float y);
-
+	
 	public abstract void onSwipeUp(float x, float y);
-
+	
 	public abstract void onSwipeDown(float x, float y);
 }
