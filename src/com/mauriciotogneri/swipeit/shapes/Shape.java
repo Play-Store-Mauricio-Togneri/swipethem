@@ -37,6 +37,11 @@ public class Shape
 
 	public void draw(int positionLocation, int colorLocation)
 	{
+		draw(positionLocation, colorLocation, 1);
+	}
+	
+	public void draw(int positionLocation, int colorLocation, float alpha)
+	{
 		this.vertexData.position(0);
 		GLES20.glVertexAttribPointer(positionLocation, Shape.POSITION_COMPONENT_COUNT, GLES20.GL_FLOAT, false, Shape.STRIDE, this.vertexData);
 		GLES20.glEnableVertexAttribArray(positionLocation);
@@ -45,7 +50,7 @@ public class Shape
 		float green = Color.green(this.color) / 255f;
 		float blue = Color.blue(this.color) / 255f;
 
-		GLES20.glUniform4f(colorLocation, red, green, blue, 1);
+		GLES20.glUniform4f(colorLocation, red, green, blue, alpha);
 
 		GLES20.glDrawArrays(this.mode, 0, this.length);
 	}

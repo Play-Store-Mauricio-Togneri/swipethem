@@ -15,7 +15,7 @@ public class Game
 	public static final int RESOLUTION_Y = 6;
 	private static final int MAX_NUMBER_OF_TILES = Game.RESOLUTION_X * Game.RESOLUTION_Y;
 	private static final int DIFFICULTY_LIMIT = 10;
-	private static final int TOTAL_TIME = 10;
+	private static final int TOTAL_TIME = 60;
 
 	private final MainActivity activity;
 	private final Renderer renderer;
@@ -147,6 +147,7 @@ public class Game
 
 		for (Tile tile : this.tiles)
 		{
+			tile.update(delta);
 			tile.draw(positionLocation, colorLocation);
 		}
 	}
