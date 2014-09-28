@@ -13,9 +13,9 @@ public class Tile
 {
 	private final Type type;
 	
-	private final float x;
-	private final float y;
-
+	private final int i;
+	private final int j;
+	
 	private final Square square;
 	private final Arrow arrow;
 	
@@ -27,7 +27,7 @@ public class Tile
 		UP(Color.argb(255, 60, 170, 230), InputEvent.Type.SWIPE_UP), //
 		DOWN(Color.argb(255, 255, 60, 60), InputEvent.Type.SWIPE_DOWN), //
 		LEFT(Color.argb(255, 255, 200, 40), InputEvent.Type.SWIPE_LEFT), //
-		RIGHT(Color.argb(255, 100, 200, 100), InputEvent.Type.SWIPE_RIGHT);
+		RIGHT(Color.argb(255, 100, 200, 100), InputEvent.Type.SWIPE_RIGHT); //
 		
 		private int color;
 		private InputEvent.Type input;
@@ -49,12 +49,16 @@ public class Tile
 		}
 	}
 	
-	public Tile(Type type, float x, float y)
+	public Tile(Type type, int i, int j)
 	{
 		this.type = type;
-		this.x = x;
-		this.y = y;
 
+		this.i = i;
+		this.j = j;
+		
+		float x = i + Tile.BLOCK_SIDE;
+		float y = j + Tile.BLOCK_SIDE;
+		
 		this.square = new Square(x, y, Tile.TILE_SIDE, type.getColor());
 		
 		switch (type)
@@ -77,11 +81,11 @@ public class Tile
 		}
 	}
 	
-	public boolean isInside(float x, float y)
+	public boolean isIn(int i, int j)
 	{
-		return (x >= (this.x - Tile.BLOCK_SIDE)) && (x <= (this.x + Tile.BLOCK_SIDE)) && (y >= (this.y - Tile.BLOCK_SIDE)) && (y <= (this.y + Tile.BLOCK_SIDE));
+		return (i == this.i) && (j == this.j);
 	}
-
+	
 	public boolean disables(InputEvent.Type input)
 	{
 		return this.type.disables(input);
