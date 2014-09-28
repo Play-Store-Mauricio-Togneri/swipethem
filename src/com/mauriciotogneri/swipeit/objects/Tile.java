@@ -24,21 +24,28 @@ public class Tile
 	
 	public enum Type
 	{
-		UP(Color.argb(255, 60, 170, 230)), //
-		DOWN(Color.argb(255, 255, 60, 60)), //
-		LEFT(Color.argb(255, 255, 200, 40)), //
-		RIGHT(Color.argb(255, 100, 200, 100));
+		UP(Color.argb(255, 60, 170, 230), InputEvent.Type.SWIPE_UP), //
+		DOWN(Color.argb(255, 255, 60, 60), InputEvent.Type.SWIPE_DOWN), //
+		LEFT(Color.argb(255, 255, 200, 40), InputEvent.Type.SWIPE_LEFT), //
+		RIGHT(Color.argb(255, 100, 200, 100), InputEvent.Type.SWIPE_RIGHT);
 		
 		private int color;
+		private InputEvent.Type input;
 		
-		private Type(int color)
+		private Type(int color, InputEvent.Type input)
 		{
 			this.color = color;
+			this.input = input;
 		}
 		
 		public int getColor()
 		{
 			return this.color;
+		}
+		
+		public boolean disables(InputEvent.Type input)
+		{
+			return (this.input == input);
 		}
 	}
 	
@@ -75,9 +82,9 @@ public class Tile
 		return (x >= (this.x - Tile.BLOCK_SIDE)) && (x <= (this.x + Tile.BLOCK_SIDE)) && (y >= (this.y - Tile.BLOCK_SIDE)) && (y <= (this.y + Tile.BLOCK_SIDE));
 	}
 
-	public boolean isType(InputEvent.Type type)
+	public boolean disables(InputEvent.Type input)
 	{
-		return true;// (this.type == type);
+		return this.type.disables(input);
 	}
 	
 	public void draw(int positionLocation, int colorLocation)

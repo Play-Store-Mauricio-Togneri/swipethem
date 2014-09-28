@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.widget.TextView;
 import com.mauriciotogneri.swipeit.objects.Game;
 
 public class MainActivity extends Activity
@@ -21,6 +22,21 @@ public class MainActivity extends Activity
 		GLSurfaceView surfaceView = (GLSurfaceView)findViewById(R.id.glSurface);
 		this.game = new Game(this, surfaceView);
 		surfaceView.setRenderer(this.game.getRenderer());
+
+	}
+	
+	public void setScore(final int score)
+	{
+		runOnUiThread(new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				TextView scoreView = (TextView)findViewById(R.id.score);
+				scoreView.setText(String.valueOf(score));
+			}
+		});
 	}
 
 	@Override

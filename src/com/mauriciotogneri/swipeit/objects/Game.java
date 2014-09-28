@@ -3,8 +3,8 @@ package com.mauriciotogneri.swipeit.objects;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import android.content.Context;
 import android.opengl.GLSurfaceView;
+import com.mauriciotogneri.swipeit.MainActivity;
 import com.mauriciotogneri.swipeit.input.InputEvent;
 import com.mauriciotogneri.swipeit.objects.Tile.Type;
 
@@ -13,14 +13,24 @@ public class Game
 	public static final int RESOLUTION_X = 5;
 	public static final int RESOLUTION_Y = 8;
 
+	private final MainActivity activity;
 	private final Renderer renderer;
+
+	private int score = 0;
 
 	private final List<Tile> tiles = new ArrayList<Tile>();
 	
-	public Game(Context context, GLSurfaceView surfaceView)
+	public Game(MainActivity activity, GLSurfaceView surfaceView)
 	{
-		this.renderer = new Renderer(context, this, surfaceView);
+		this.activity = activity;
+		this.renderer = new Renderer(activity, this, surfaceView);
 
+		initializeTiles();
+		setScore();
+	}
+
+	private void initializeTiles()
+	{
 		Random random = new Random();
 
 		for (int i = 0; i < Game.RESOLUTION_X; i++)
@@ -33,62 +43,15 @@ public class Game
 		}
 	}
 
+	public void setScore()
+	{
+		this.activity.setScore(this.score);
+	}
+
 	public Renderer getRenderer()
 	{
 		return this.renderer;
 	}
-
-	public void onTap(float x, float y)
-	{
-		// for (Tile tile : this.tiles)
-		// {
-		// if (tile.isInside(x, y) && tile.isType(Type.UP))
-		// {
-		// this.tiles.remove(tile);
-		// break;
-		// }
-		// }
-	}
-	
-	// public void onSwipeUp(float x, float y)
-	// {
-	// Tile tile = getTile(x, y);
-	//
-	// if ((tile != null) && tile.isType(Type.UP))
-	// {
-	// this.tiles.remove(tile);
-	// }
-	// }
-	
-	// public void onSwipeDown(float x, float y)
-	// {
-	// Tile tile = getTile(x, y);
-	//
-	// if ((tile != null) && tile.isType(Type.DOWN))
-	// {
-	// this.tiles.remove(tile);
-	// }
-	// }
-	
-	// public void onSwipeLeft(float x, float y)
-	// {
-	// Tile tile = getTile(x, y);
-	//
-	// if ((tile != null) && tile.isType(Type.LEFT))
-	// {
-	// this.tiles.remove(tile);
-	// }
-	// }
-	
-	// public void onSwipeRight(float x, float y)
-	// {
-	// Tile tile = getTile(x, y);
-	//
-	// if ((tile != null) && tile.isType(Type.RIGHT))
-	// {
-	// this.tiles.remove(tile);
-	// }
-	// }
 
 	private Tile getTile(float x, float y)
 	{
@@ -145,9 +108,11 @@ public class Game
 		{
 			Tile tile = getTile(input.x, input.y);
 
-			if ((tile != null) && tile.isType(input.type))
+			if ((tile != null) && tile.disables(input.type))
 			{
 				this.tiles.remove(tile);
+				this.score++;
+				setScore();
 			}
 		}
 	}
