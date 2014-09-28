@@ -44,14 +44,21 @@ public class Game
 
 	public void updateScore()
 	{
+		if (this.score < 0)
+		{
+			this.score = 0;
+		}
+		
 		this.activity.updateScore(this.score);
 	}
 	
 	public void updateTimer()
 	{
-		this.activity.updateTimer((int)this.time, (this.time > 9) ? Game.COLOR_NORMAL : Game.COLOR_WARNING);
+		int finalTime = (int)this.time;
 		
-		if ((this.time < 1) && (!this.finished))
+		this.activity.updateTimer((finalTime > 9) ? String.valueOf(finalTime) : ("0" + finalTime), (finalTime > 9) ? Game.COLOR_NORMAL : Game.COLOR_WARNING);
+		
+		if ((finalTime == 0) && (!this.finished))
 		{
 			this.finished = true;
 			this.activity.showFinalScore(this.score);
@@ -190,6 +197,9 @@ public class Game
 					}
 					else
 					{
+						this.score--;
+						updateScore();
+						
 						this.audioManager.playSound("audio/sound/bad.ogg");
 					}
 				}

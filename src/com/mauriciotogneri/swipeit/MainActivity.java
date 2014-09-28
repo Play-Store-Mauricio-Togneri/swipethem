@@ -41,7 +41,7 @@ public class MainActivity extends Activity
 		});
 	}
 
-	public void updateTimer(final int time, final int color)
+	public void updateTimer(final String time, final int color)
 	{
 		runOnUiThread(new Runnable()
 		{
@@ -50,15 +50,7 @@ public class MainActivity extends Activity
 			{
 				TextView timeView = (TextView)findViewById(R.id.timer);
 				timeView.setTextColor(color);
-
-				if (time > 9)
-				{
-					timeView.setText(String.valueOf(time));
-				}
-				else if (time >= 0)
-				{
-					timeView.setText("0" + time);
-				}
+				timeView.setText(time);
 			}
 		});
 	}
@@ -71,7 +63,7 @@ public class MainActivity extends Activity
 			public void run()
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-				builder.setTitle("Times's up!");
+				builder.setTitle("Time's up!");
 				builder.setCancelable(false);
 				builder.setMessage("\r\nScore: " + score + "\r\n");
 				
