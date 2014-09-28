@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import android.opengl.GLSurfaceView;
 import com.mauriciotogneri.swipeit.MainActivity;
+import com.mauriciotogneri.swipeit.audio.AudioManager;
 import com.mauriciotogneri.swipeit.input.InputEvent;
 import com.mauriciotogneri.swipeit.objects.Tile.TileType;
 
@@ -17,6 +18,7 @@ public class Game
 
 	private final MainActivity activity;
 	private final Renderer renderer;
+	private final AudioManager audioManager;
 
 	private float time = 60;
 	private int score = 0;
@@ -28,6 +30,7 @@ public class Game
 	{
 		this.activity = activity;
 		this.renderer = new Renderer(activity, this, surfaceView);
+		this.audioManager = new AudioManager(activity);
 
 		createNewTile();
 		updateScore();
@@ -166,11 +169,11 @@ public class Game
 							}
 						}
 
-						// TODO: GOOD SOUND
+						this.audioManager.playSound("audio/good.ogg");
 					}
 					else
 					{
-						// TODO: BAD SOUND
+						this.audioManager.playSound("audio/bad.ogg");
 					}
 				}
 			}
