@@ -13,6 +13,7 @@ import com.mauriciotogneri.swipeit.objects.Game;
 public class MainActivity extends Activity
 {
 	private Game game;
+	private GLSurfaceView surfaceView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -22,10 +23,9 @@ public class MainActivity extends Activity
 
 		setContentView(R.layout.activity_main);
 
-		GLSurfaceView surfaceView = (GLSurfaceView)findViewById(R.id.glSurface);
-		this.game = new Game(this, surfaceView);
-		surfaceView.setRenderer(this.game.getRenderer());
-
+		this.surfaceView = (GLSurfaceView)findViewById(R.id.glSurface);
+		this.game = new Game(this, this.surfaceView);
+		this.surfaceView.setRenderer(this.game.getRenderer());
 	}
 	
 	public void updateScore(final int score)
@@ -110,10 +110,15 @@ public class MainActivity extends Activity
 	protected void onResume()
 	{
 		super.onResume();
-
+		
 		if (this.game != null)
 		{
 			this.game.resume();
+		}
+		
+		if (this.surfaceView != null)
+		{
+			this.surfaceView.onResume();
 		}
 	}
 
@@ -126,16 +131,21 @@ public class MainActivity extends Activity
 		{
 			this.game.pause(isFinishing());
 		}
+		
+		if (this.surfaceView != null)
+		{
+			this.surfaceView.onPause();
+		}
 	}
 
 	@Override
 	protected void onDestroy()
 	{
-		super.onDestroy();
-
 		if (this.game != null)
 		{
 			this.game.stop();
 		}
+		
+		super.onDestroy();
 	}
 }
