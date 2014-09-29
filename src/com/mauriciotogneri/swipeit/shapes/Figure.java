@@ -76,9 +76,9 @@ public class Figure
 	{
 		Figure result = new Figure();
 
-		result.add(new Dot(x - (side / 2), y, width, Color.WHITE));
-		result.add(new Dot(x + (side / 2), y, width, Color.WHITE));
-		result.add(new Dot(x + (side / 2), y, width, Color.WHITE));
+		result.add(new Dot(x, y + (side / 2), width, Color.WHITE));
+		result.add(new Dot(x - (side / 2), y - (side / 2), width, Color.WHITE));
+		result.add(new Dot(x + (side / 2), y - (side / 2), width, Color.WHITE));
 
 		return result;
 	}

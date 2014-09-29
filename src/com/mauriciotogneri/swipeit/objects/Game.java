@@ -8,7 +8,16 @@ import android.opengl.GLSurfaceView;
 import com.mauriciotogneri.swipeit.MainActivity;
 import com.mauriciotogneri.swipeit.audio.AudioManager;
 import com.mauriciotogneri.swipeit.input.InputEvent;
-import com.mauriciotogneri.swipeit.objects.Tile.TileType;
+import com.mauriciotogneri.swipeit.objects.tiles.Tile;
+import com.mauriciotogneri.swipeit.objects.tiles.Tile.TileType;
+import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowDown;
+import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowLeft;
+import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowRight;
+import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowUp;
+import com.mauriciotogneri.swipeit.objects.tiles.tap.TileDoubleTap;
+import com.mauriciotogneri.swipeit.objects.tiles.tap.TileQuadrupleTap;
+import com.mauriciotogneri.swipeit.objects.tiles.tap.TileSingleTap;
+import com.mauriciotogneri.swipeit.objects.tiles.tap.TileTripleTap;
 
 public class Game
 {
@@ -130,30 +139,28 @@ public class Game
 		switch (type)
 		{
 			case UP:
-				result = new Tile(TileType.UP, i, j);
+				result = new TileArrowUp(i, j);
 				break;
 			case DOWN:
-				result = new Tile(TileType.DOWN, i, j);
+				result = new TileArrowDown(i, j);
 				break;
 			case LEFT:
-				result = new Tile(TileType.LEFT, i, j);
+				result = new TileArrowLeft(i, j);
 				break;
 			case RIGHT:
-				result = new Tile(TileType.RIGHT, i, j);
+				result = new TileArrowRight(i, j);
 				break;
-			case TAP_1:
-				result = new Tile(TileType.TAP_1, i, j);
+			case SINGLE_TAP:
+				result = new TileSingleTap(i, j);
 				break;
-			case TAP_2:
-				result = new Tile(TileType.TAP_2, i, j);
+			case DOUBLE_TAP:
+				result = new TileDoubleTap(i, j);
 				break;
-			case TAP_3:
-				result = new Tile(TileType.TAP_3, i, j);
+			case TRIPLE_TAP:
+				result = new TileTripleTap(i, j);
 				break;
-			case TAP_4:
-				result = new Tile(TileType.TAP_4, i, j);
-				break;
-			default:
+			case QUADRUPLE_TAP:
+				result = new TileQuadrupleTap(i, j);
 				break;
 		}
 
@@ -185,11 +192,11 @@ public class Game
 			
 			if (tile != null)
 			{
-				if (tile.accepts(input.type))
+				if (tile.acceptsInput(input.type))
 				{
 					tile.process(input.type);
 					
-					if (tile.isDisabledOk())
+					if (tile.isDisabled())
 					{
 						this.tiles.remove(tile);
 						createNewTile();
@@ -211,7 +218,7 @@ public class Game
 						
 						this.audioManager.playSound("audio/sound/good.ogg");
 					}
-					else if (tile.isDisabledFail())
+					else if (tile.isFailed())
 					{
 						this.tiles.remove(tile);
 						createNewTile();
