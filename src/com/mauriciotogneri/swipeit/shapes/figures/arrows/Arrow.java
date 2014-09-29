@@ -1,5 +1,6 @@
-package com.mauriciotogneri.swipeit.shapes;
+package com.mauriciotogneri.swipeit.shapes.figures.arrows;
 
+import com.mauriciotogneri.swipeit.shapes.Shape;
 import android.opengl.GLES20;
 
 public class Arrow extends Shape

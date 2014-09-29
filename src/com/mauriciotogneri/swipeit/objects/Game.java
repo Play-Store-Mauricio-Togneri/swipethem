@@ -17,59 +17,59 @@ public class Game
 	private static final int MAX_NUMBER_OF_TILES = Game.RESOLUTION_X * Game.RESOLUTION_Y;
 	private static final int DIFFICULTY_LIMIT = 10;
 	private static final int TOTAL_TIME = 60;
-	
+
 	private static final int COLOR_NORMAL = Color.argb(255, 85, 85, 85);
 	private static final int COLOR_WARNING = Color.argb(255, 255, 60, 60);
-
+	
 	private final MainActivity activity;
 	private final Renderer renderer;
 	private final AudioManager audioManager;
-
+	
 	private float time = Game.TOTAL_TIME;
 	private int score = 0;
 	private int difficultyCounter = 0;
 	private boolean finished = false;
-
-	private final List<Tile> tiles = new ArrayList<Tile>();
 	
+	private final List<Tile> tiles = new ArrayList<Tile>();
+
 	public Game(MainActivity activity, GLSurfaceView surfaceView)
 	{
 		this.activity = activity;
 		this.renderer = new Renderer(activity, this, surfaceView);
 		this.audioManager = new AudioManager(activity);
 		this.audioManager.playAudio("audio/music/music.ogg");
-
+		
 		restart();
 	}
-
+	
 	public void updateScore()
 	{
 		if (this.score < 0)
 		{
 			this.score = 0;
 		}
-		
+
 		this.activity.updateScore(this.score);
 	}
-	
+
 	public void updateTimer()
 	{
 		int finalTime = (int)this.time;
-		
+
 		this.activity.updateTimer((finalTime > 9) ? String.valueOf(finalTime) : ("0" + finalTime), (finalTime > 9) ? Game.COLOR_NORMAL : Game.COLOR_WARNING);
-		
+
 		if ((finalTime == 0) && (!this.finished))
 		{
 			this.finished = true;
 			this.activity.showFinalScore(this.score);
 		}
 	}
-
+	
 	public Renderer getRenderer()
 	{
 		return this.renderer;
 	}
-
+	
 	public void restart()
 	{
 		this.time = Game.TOTAL_TIME;
@@ -77,40 +77,40 @@ public class Game
 		this.difficultyCounter = 0;
 		this.finished = false;
 		this.tiles.clear();
-		
+
 		createNewTile();
 		updateScore();
 		updateTimer();
 	}
-
+	
 	private void createNewTile()
 	{
 		Tile initialTile = getNewTile();
 		this.tiles.add(initialTile);
 	}
-
+	
 	private Tile getNewTile()
 	{
 		Random random = new Random();
-
+		
 		TileType type = TileType.values()[random.nextInt(TileType.values().length)];
-
+		
 		int i = random.nextInt(Game.RESOLUTION_X);
 		int j = random.nextInt(Game.RESOLUTION_Y);
-
+		
 		while (tileOccupied(i, j))
 		{
 			i = random.nextInt(Game.RESOLUTION_X);
 			j = random.nextInt(Game.RESOLUTION_Y);
 		}
-
+		
 		return createTile(type, i, j);
 	}
-
+	
 	private boolean tileOccupied(int i, int j)
 	{
 		boolean result = false;
-
+		
 		for (Tile tile : this.tiles)
 		{
 			if (tile.isIn(i, j))
@@ -119,14 +119,14 @@ public class Game
 				break;
 			}
 		}
-
+		
 		return result;
 	}
-
+	
 	private Tile createTile(TileType type, int i, int j)
 	{
 		Tile result = null;
-
+		
 		switch (type)
 		{
 			case UP:
@@ -141,62 +141,81 @@ public class Game
 			case RIGHT:
 				result = new Tile(TileType.RIGHT, i, j);
 				break;
+			case TAP_1:
+				result = new Tile(TileType.TAP_1, i, j);
+				break;
+			case TAP_2:
+				result = new Tile(TileType.TAP_2, i, j);
+				break;
+			case TAP_3:
+				result = new Tile(TileType.TAP_3, i, j);
+				break;
+			case TAP_4:
+				result = new Tile(TileType.TAP_4, i, j);
+				break;
+			default:
+				break;
 		}
-		
+
 		return result;
 	}
-	
+
 	public void update(float delta, int positionLocation, int colorLocation, InputEvent input)
 	{
 		if (!this.finished)
 		{
 			this.time -= delta;
 			updateTimer();
-
+			
 			processInput(input);
 		}
-
+		
 		for (Tile tile : this.tiles)
 		{
 			tile.update(delta);
 			tile.draw(positionLocation, colorLocation);
 		}
 	}
-	
+
 	private void processInput(InputEvent input)
 	{
 		if (input.isValid())
 		{
 			Tile tile = getTile(input.x, input.y);
-
+			
 			if (tile != null)
 			{
 				if (tile.accepts(input.type))
 				{
-					this.tiles.remove(tile);
-					createNewTile();
+					tile.process(input.type);
 					
-					if (tile.disables(input.type))
+					if (tile.isDisabledOk())
 					{
+						this.tiles.remove(tile);
+						createNewTile();
+
 						this.score++;
 						updateScore();
-
+						
 						this.difficultyCounter++;
-
+						
 						if (this.difficultyCounter == Game.DIFFICULTY_LIMIT)
 						{
 							this.difficultyCounter = 0;
-
+							
 							if (this.tiles.size() < Game.MAX_NUMBER_OF_TILES)
 							{
 								createNewTile();
 							}
 						}
-
+						
 						this.audioManager.playSound("audio/sound/good.ogg");
 					}
-					else
+					else if (tile.isDisabledFail())
 					{
+						this.tiles.remove(tile);
+						createNewTile();
+
 						this.score--;
 						updateScore();
 						
@@ -206,11 +225,11 @@ public class Game
 			}
 		}
 	}
-	
+
 	private Tile getTile(int x, int y)
 	{
 		Tile result = null;
-
+		
 		for (Tile tile : this.tiles)
 		{
 			if (tile.isIn(x, y))
@@ -219,36 +238,36 @@ public class Game
 				break;
 			}
 		}
-
+		
 		return result;
 	}
-	
+
 	public void resume()
 	{
 		if (this.audioManager != null)
 		{
 			this.audioManager.resumeAudio();
 		}
-		
+
 		if (this.renderer != null)
 		{
 			this.renderer.resume();
 		}
 	}
-	
+
 	public void pause(boolean finishing)
 	{
 		if (this.audioManager != null)
 		{
 			this.audioManager.pauseAudio();
 		}
-		
+
 		if (this.renderer != null)
 		{
 			this.renderer.pause(finishing);
 		}
 	}
-
+	
 	public void stop()
 	{
 		if (this.audioManager != null)

@@ -1,4 +1,4 @@
-package com.mauriciotogneri.swipeit.shapes;
+package com.mauriciotogneri.swipeit.shapes.figures.arrows;
 
 public class ArrowRight extends Arrow
 {
