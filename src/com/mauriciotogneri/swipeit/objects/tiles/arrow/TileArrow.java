@@ -8,7 +8,7 @@ public abstract class TileArrow extends Tile
 {
 	protected boolean disabled = false;
 	protected boolean failed = false;
-
+	
 	private static final InputType[] INPUTS = new InputType[]
 		{
 			InputType.SWIPE_UP, //
@@ -17,10 +17,16 @@ public abstract class TileArrow extends Tile
 			InputType.SWIPE_RIGHT, //
 			InputType.TAP_UP
 		};
-
+	
 	public TileArrow(int i, int j, int color, Figure figure)
 	{
 		super(i, j, color, figure, TileArrow.INPUTS);
+	}
+	
+	@Override
+	public boolean isTapped()
+	{
+		return false;
 	}
 
 	@Override
@@ -28,7 +34,7 @@ public abstract class TileArrow extends Tile
 	{
 		return this.disabled;
 	}
-
+	
 	@Override
 	public boolean isFailed()
 	{

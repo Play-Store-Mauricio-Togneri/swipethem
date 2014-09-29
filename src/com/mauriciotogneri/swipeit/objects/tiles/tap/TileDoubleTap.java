@@ -7,18 +7,20 @@ import com.mauriciotogneri.swipeit.shapes.Figure;
 public class TileDoubleTap extends TileTap
 {
 	private static final int COLOR = Color.argb(255, 255, 60, 60);
-	
+
 	public TileDoubleTap(int i, int j)
 	{
 		super(i, j, TileDoubleTap.COLOR, Figure.getDoubleDot(i + Tile.BLOCK_SIDE, j + Tile.BLOCK_SIDE, 0.1f, Tile.TILE_SIDE));
 	}
-	
+
 	@Override
-	protected void verifyTaps()
+	protected boolean verifyTaps()
 	{
 		if (this.taps == 2)
 		{
 			this.disabled = true;
 		}
+
+		return (this.taps < 2);
 	}
 }
