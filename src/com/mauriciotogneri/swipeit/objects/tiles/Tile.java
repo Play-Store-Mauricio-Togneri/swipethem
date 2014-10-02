@@ -9,14 +9,19 @@ public abstract class Tile
 {
 	private final int i;
 	private final int j;
+
+	private final float x;
+	private final float y;
 	
+	private final int color;
+
 	private float alpha = 0;
 	private float timer = 0;
 
 	protected boolean disabled = false;
 	protected boolean failed = false;
 	
-	private final Square square;
+	private final Square squareBackground;
 	private final Figure figure;
 	private final InputType[] validInputs;
 	
@@ -50,11 +55,16 @@ public abstract class Tile
 	{
 		this.i = i;
 		this.j = j;
+		this.x = i + Tile.BLOCK_SIDE;
+		this.y = j + Tile.BLOCK_SIDE;
 		
-		float x = i + Tile.BLOCK_SIDE;
-		float y = j + Tile.BLOCK_SIDE;
+		this.squareBackground = new Square(this.x, this.y, Tile.TILE_SIDE, color);
+
+		int red = Color.red(color) - 50;
+		int green = Color.green(color) - 50;
+		int blue = Color.blue(color) - 50;
+		this.color = Color.argb(255, (red < 0) ? 0 : red, (green < 0) ? 0 : green, (blue < 0) ? 0 : blue);
 		
-		this.square = new Square(x, y, Tile.TILE_SIDE, color);
 		this.figure = figure;
 		this.validInputs = validInputs;
 	}
@@ -112,8 +122,11 @@ public abstract class Tile
 	
 	public void draw(int positionLocation, int colorLocation)
 	{
-		this.square.draw(positionLocation, colorLocation, this.alpha);
+		this.squareBackground.draw(positionLocation, colorLocation, this.alpha);
 		
+		Square squareForeground = new Square(this.x, this.y, Tile.TILE_SIDE * (this.timer / Tile.TIME_LIMIT), this.color);
+		squareForeground.draw(positionLocation, colorLocation, this.alpha);
+
 		if (this.figure != null)
 		{
 			this.figure.draw(positionLocation, colorLocation, this.alpha);
