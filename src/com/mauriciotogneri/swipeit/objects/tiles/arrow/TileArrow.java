@@ -14,15 +14,9 @@ public abstract class TileArrow extends Tile
 			InputType.SWIPE_RIGHT, //
 			InputType.TAP_UP
 		};
-	
+
 	public TileArrow(int i, int j, int color, Figure figure)
 	{
 		super(i, j, color, figure, TileArrow.INPUTS);
-	}
-	
-	@Override
-	public boolean isTapped()
-	{
-		return false;
 	}
 }

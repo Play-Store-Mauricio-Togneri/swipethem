@@ -43,7 +43,7 @@ public class Game
 		this.activity = activity;
 		this.renderer = new Renderer(activity, this, surfaceView);
 		this.audioManager = new AudioManager(activity);
-		this.audioManager.playAudio("audio/music/music2.ogg");
+		this.audioManager.playAudio("audio/music/music.ogg");
 
 		restart();
 	}
@@ -200,11 +200,6 @@ public class Game
 
 	private void checkTile(Tile tile)
 	{
-		if (tile.isTapped())
-		{
-			this.audioManager.playSound("audio/sound/tapped.ogg");
-		}
-
 		if (tile.isDisabled())
 		{
 			this.tiles.remove(tile);
