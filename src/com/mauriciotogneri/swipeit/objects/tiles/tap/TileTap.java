@@ -8,8 +8,6 @@ public abstract class TileTap extends Tile
 {
 	protected int taps = 0;
 	protected boolean tapped = false;
-	protected boolean disabled = false;
-	protected boolean failed = false;
 	
 	private static final InputType[] INPUTS = new InputType[]
 		{
@@ -45,17 +43,5 @@ public abstract class TileTap extends Tile
 	public boolean isTapped()
 	{
 		return this.tapped;
-	}
-	
-	@Override
-	public boolean isDisabled()
-	{
-		return this.disabled;
-	}
-	
-	@Override
-	public boolean isFailed()
-	{
-		return this.failed;
 	}
 }

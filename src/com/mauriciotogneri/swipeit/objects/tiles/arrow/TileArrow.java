@@ -6,9 +6,6 @@ import com.mauriciotogneri.swipeit.shapes.Figure;
 
 public abstract class TileArrow extends Tile
 {
-	protected boolean disabled = false;
-	protected boolean failed = false;
-	
 	private static final InputType[] INPUTS = new InputType[]
 		{
 			InputType.SWIPE_UP, //
@@ -27,17 +24,5 @@ public abstract class TileArrow extends Tile
 	public boolean isTapped()
 	{
 		return false;
-	}
-
-	@Override
-	public boolean isDisabled()
-	{
-		return this.disabled;
-	}
-	
-	@Override
-	public boolean isFailed()
-	{
-		return this.failed;
 	}
 }

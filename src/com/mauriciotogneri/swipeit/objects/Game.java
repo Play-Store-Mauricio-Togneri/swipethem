@@ -163,14 +163,22 @@ public class Game
 			updateTimer();
 
 			processInput(input);
+			
+			for (Tile tile : getTileList())
+			{
+				tile.update(delta);
+				checkTile(tile);
+				tile.draw(positionLocation, colorLocation);
+			}
 		}
+	}
 
-		// TODO: ConcurrentModificationException
-		for (Tile tile : this.tiles)
-		{
-			tile.update(delta);
-			tile.draw(positionLocation, colorLocation);
-		}
+	private Tile[] getTileList()
+	{
+		Tile[] result = new Tile[this.tiles.size()];
+		this.tiles.toArray(result);
+
+		return result;
 	}
 	
 	private void processInput(InputEvent input)
@@ -184,46 +192,50 @@ public class Game
 				if (tile.acceptsInput(input.type))
 				{
 					tile.process(input.type);
-
-					if (tile.isTapped())
-					{
-						this.audioManager.playSound("audio/sound/tapped.ogg");
-					}
-
-					if (tile.isDisabled())
-					{
-						this.tiles.remove(tile);
-						createNewTile();
-						
-						this.score++;
-						updateScore();
-
-						this.difficultyCounter++;
-
-						if (this.difficultyCounter == Game.DIFFICULTY_LIMIT)
-						{
-							this.difficultyCounter = 0;
-
-							if (this.tiles.size() < Game.MAX_NUMBER_OF_TILES)
-							{
-								createNewTile();
-							}
-						}
-
-						this.audioManager.playSound("audio/sound/good.ogg");
-					}
-					else if (tile.isFailed())
-					{
-						this.tiles.remove(tile);
-						createNewTile();
-						
-						this.score--;
-						updateScore();
-
-						this.audioManager.playSound("audio/sound/bad.ogg");
-					}
+					// checkTile(tile);
 				}
 			}
+		}
+	}
+
+	private void checkTile(Tile tile)
+	{
+		if (tile.isTapped())
+		{
+			this.audioManager.playSound("audio/sound/tapped.ogg");
+		}
+
+		if (tile.isDisabled())
+		{
+			this.tiles.remove(tile);
+			createNewTile();
+			
+			this.score++;
+			updateScore();
+
+			this.difficultyCounter++;
+
+			if (this.difficultyCounter == Game.DIFFICULTY_LIMIT)
+			{
+				this.difficultyCounter = 0;
+
+				if (this.tiles.size() < Game.MAX_NUMBER_OF_TILES)
+				{
+					createNewTile();
+				}
+			}
+
+			this.audioManager.playSound("audio/sound/good.ogg");
+		}
+		else if (tile.isFailed())
+		{
+			this.tiles.remove(tile);
+			createNewTile();
+			
+			this.score--;
+			updateScore();
+
+			this.audioManager.playSound("audio/sound/bad.ogg");
 		}
 	}
 	
