@@ -14,10 +14,7 @@ import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowDown;
 import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowLeft;
 import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowRight;
 import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowUp;
-import com.mauriciotogneri.swipeit.objects.tiles.tap.TileDoubleTap;
-import com.mauriciotogneri.swipeit.objects.tiles.tap.TileQuadrupleTap;
 import com.mauriciotogneri.swipeit.objects.tiles.tap.TileSingleTap;
-import com.mauriciotogneri.swipeit.objects.tiles.tap.TileTripleTap;
 
 public class Game
 {
@@ -153,15 +150,6 @@ public class Game
 			case SINGLE_TAP:
 				result = new TileSingleTap(i, j);
 				break;
-			case DOUBLE_TAP:
-				result = new TileDoubleTap(i, j);
-				break;
-			case TRIPLE_TAP:
-				result = new TileTripleTap(i, j);
-				break;
-			case QUADRUPLE_TAP:
-				result = new TileQuadrupleTap(i, j);
-				break;
 		}
 		
 		return result;
@@ -177,6 +165,7 @@ public class Game
 			processInput(input);
 		}
 
+		// TODO: ConcurrentModificationException
 		for (Tile tile : this.tiles)
 		{
 			tile.update(delta);

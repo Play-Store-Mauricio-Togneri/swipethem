@@ -10,7 +10,7 @@ public abstract class TileTap extends Tile
 	protected boolean tapped = false;
 	protected boolean disabled = false;
 	protected boolean failed = false;
-
+	
 	private static final InputType[] INPUTS = new InputType[]
 		{
 			InputType.SWIPE_UP, //
@@ -19,12 +19,12 @@ public abstract class TileTap extends Tile
 			InputType.SWIPE_RIGHT, //
 			InputType.TAP_UP
 		};
-
+	
 	public TileTap(int i, int j, int color, Figure figure)
 	{
 		super(i, j, color, figure, TileTap.INPUTS);
 	}
-
+	
 	@Override
 	public void process(InputType input)
 	{
@@ -38,21 +38,21 @@ public abstract class TileTap extends Tile
 			this.failed = true;
 		}
 	}
-
-	protected abstract boolean verifyTaps();
 	
+	protected abstract boolean verifyTaps();
+
 	@Override
 	public boolean isTapped()
 	{
 		return this.tapped;
 	}
-
+	
 	@Override
 	public boolean isDisabled()
 	{
 		return this.disabled;
 	}
-
+	
 	@Override
 	public boolean isFailed()
 	{

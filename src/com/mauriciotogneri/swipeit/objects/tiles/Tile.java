@@ -25,10 +25,7 @@ public abstract class Tile
 		DOWN(Color.argb(255, 255, 60, 60)), //
 		LEFT(Color.argb(255, 255, 200, 40)), //
 		RIGHT(Color.argb(255, 100, 200, 100)), //
-		SINGLE_TAP(Color.argb(255, 60, 170, 230)), //
-		DOUBLE_TAP(Color.argb(255, 255, 60, 60)), //
-		TRIPLE_TAP(Color.argb(255, 255, 200, 40)), //
-		QUADRUPLE_TAP(Color.argb(255, 100, 200, 100)); //
+		SINGLE_TAP(Color.argb(255, 60, 170, 230));
 
 		private int color;
 
