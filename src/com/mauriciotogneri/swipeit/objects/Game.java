@@ -41,6 +41,7 @@ public class Game
 	private int difficultyCounter = 0;
 	private boolean finished = false;
 	
+	private final Object listLock = new Object();
 	private final List<Tile> activeTiles = new ArrayList<Tile>();
 	private final List<Tile> finishedTiles = new ArrayList<Tile>();
 
@@ -54,7 +55,7 @@ public class Game
 		restart();
 	}
 	
-	public void updateScore(int value)
+	private void updateScore(int value)
 	{
 		this.score += value;
 		
@@ -66,7 +67,7 @@ public class Game
 		this.activity.updateScore(this.score);
 	}
 
-	public void updateTimer()
+	private void updateTimer()
 	{
 		int finalTime = (int)this.time;
 
@@ -86,16 +87,19 @@ public class Game
 	
 	public void restart()
 	{
-		this.time = Game.TOTAL_TIME;
-		this.score = 0;
-		this.difficultyCounter = 0;
-		this.finished = false;
-		this.activeTiles.clear();
-		this.finishedTiles.clear();
-
-		createNormalTile();
-		updateScore(0);
-		updateTimer();
+		synchronized (this.listLock)
+		{
+			this.time = Game.TOTAL_TIME;
+			this.score = 0;
+			this.difficultyCounter = 0;
+			this.finished = false;
+			this.activeTiles.clear();
+			this.finishedTiles.clear();
+			
+			createNormalTile();
+			updateScore(0);
+			updateTimer();
+		}
 	}
 	
 	private void createNormalTile()
@@ -200,25 +204,38 @@ public class Game
 
 	public void update(float delta, int positionLocation, int colorLocation, InputEvent input)
 	{
-		if (!this.finished)
+		synchronized (this.listLock)
 		{
-			this.time -= delta;
-			updateTimer();
+			Tile[] actives = getActiveTileList();
+			Tile[] finished = getFinishedTileList();
 			
-			processInput(input);
-
-			// TODO: FUSE BOTH LISTS
-			for (Tile tile : getActiveTileList())
+			if (!this.finished)
 			{
-				tile.update(delta);
-				processActiveTile(tile);
+				this.time -= delta;
+				updateTimer();
+
+				processInput(input);
+				
+				for (Tile tile : actives)
+				{
+					tile.update(delta);
+					processActiveTile(tile);
+				}
+
+				for (Tile tile : finished)
+				{
+					tile.update(delta);
+					processFinishedTile(tile);
+				}
+			}
+
+			for (Tile tile : actives)
+			{
 				tile.draw(positionLocation, colorLocation);
 			}
 
-			for (Tile tile : getFinishedTileList())
+			for (Tile tile : finished)
 			{
-				tile.update(delta);
-				processFinishedTile(tile);
 				tile.draw(positionLocation, colorLocation);
 			}
 		}
