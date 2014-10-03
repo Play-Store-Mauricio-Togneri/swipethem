@@ -282,7 +282,7 @@ public class Game
 			this.level++;
 			this.difficultyCounter = 0;
 
-			if ((this.level % 2) == 0)
+			if ((this.level % 3) == 0)
 			{
 				createFakeTile();
 			}
