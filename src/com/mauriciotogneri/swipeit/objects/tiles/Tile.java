@@ -9,18 +9,19 @@ public abstract class Tile
 {
 	private final int i;
 	private final int j;
-
+	
 	private final float x;
 	private final float y;
 	
 	private final int color;
-
+	
 	private float alpha = 0;
 	private float timer = 0;
-
+	
 	protected boolean swipedOk = false;
 	protected boolean swipedFail = false;
 	protected boolean timeOut = false;
+	protected boolean disapear = false;
 	
 	private final Square squareBackground;
 	private final Figure figure;
@@ -30,13 +31,17 @@ public abstract class Tile
 	protected static final float TILE_SIDE = Tile.BLOCK_SIDE * 0.75f;
 	
 	private static final int TIME_LIMIT = 5;
-
+	
 	public enum TileType
 	{
-		UP(Color.argb(255, 60, 170, 230)), //
-		DOWN(Color.argb(255, 255, 60, 60)), //
-		LEFT(Color.argb(255, 255, 200, 40)), //
-		RIGHT(Color.argb(255, 100, 200, 100));
+		NORMAL_ARROW_UP(Color.argb(255, 60, 170, 230)), //
+		NORMAL_ARROW_DOWN(Color.argb(255, 255, 60, 60)), //
+		NORMAL_ARROW_LEFT(Color.argb(255, 255, 200, 40)), //
+		NORMAL_ARROW_RIGHT(Color.argb(255, 100, 200, 100)), //
+		FAKE_ARROW_UP(Color.argb(255, 60, 170, 230)), //
+		FAKE_ARROW_DOWN(Color.argb(255, 255, 60, 60)), //
+		FAKE_ARROW_LEFT(Color.argb(255, 255, 200, 40)), //
+		FAKE_ARROW_RIGHT(Color.argb(255, 100, 200, 100)); //
 		
 		private int color;
 		
@@ -59,7 +64,7 @@ public abstract class Tile
 		this.y = j + Tile.BLOCK_SIDE;
 		
 		this.squareBackground = new Square(this.x, this.y, Tile.TILE_SIDE, color);
-
+		
 		int red = Color.red(color) - 50;
 		int green = Color.green(color) - 50;
 		int blue = Color.blue(color) - 50;
@@ -91,20 +96,27 @@ public abstract class Tile
 	}
 	
 	public abstract void process(InputType input);
-
+	
 	public void update(float delta)
 	{
 		this.timer += delta;
 		this.alpha += (delta * 3);
-
+		
 		if (this.alpha > 1)
 		{
 			this.alpha = 1;
 		}
-
+		
 		if (this.timer > Tile.TIME_LIMIT)
 		{
-			this.timeOut = true;
+			if (isFake())
+			{
+				this.disapear = true;
+			}
+			else
+			{
+				this.timeOut = true;
+			}
 		}
 	}
 	
@@ -117,10 +129,20 @@ public abstract class Tile
 	{
 		return this.swipedFail;
 	}
-
+	
 	public boolean isTimeOut()
 	{
 		return this.timeOut;
+	}
+	
+	public boolean isDisappeared()
+	{
+		return this.disapear;
+	}
+	
+	public boolean isFake()
+	{
+		return false;
 	}
 	
 	public void draw(int positionLocation, int colorLocation)
@@ -129,7 +151,7 @@ public abstract class Tile
 		
 		Square squareForeground = new Square(this.x, this.y, Tile.TILE_SIDE * (this.timer / Tile.TIME_LIMIT), this.color);
 		squareForeground.draw(positionLocation, colorLocation, this.alpha);
-
+		
 		if (this.figure != null)
 		{
 			this.figure.draw(positionLocation, colorLocation, this.alpha);
