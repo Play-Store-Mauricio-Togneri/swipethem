@@ -11,19 +11,19 @@ public class Resources
 		public static final int LEFT = Color.argb(255, 255, 200, 40);
 		public static final int RIGHT = Color.argb(255, 100, 200, 100);
 	}
-
+	
 	public static class Sounds
 	{
 		public static final String SOUND_ROOT = "audio/sound/";
-
+		
 		public static final String SWIPE_OK = Sounds.SOUND_ROOT + "swipe.ogg";
 		public static final String SWIPE_FAIL = Sounds.SOUND_ROOT + "explosion.ogg";
 	}
-
+	
 	public static class Music
 	{
 		private static final String MUSIC_ROOT = "audio/music/";
-		
-		public static final String MUSIC = Music.MUSIC_ROOT + "music.ogg";
+
+		public static final String MUSIC = Music.MUSIC_ROOT + "music2.ogg";
 	}
 }
