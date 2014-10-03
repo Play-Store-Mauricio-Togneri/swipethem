@@ -11,19 +11,6 @@ public class TileArrowLeft extends TileArrow
 	
 	public TileArrowLeft(int i, int j)
 	{
-		super(i, j, TileArrowLeft.COLOR, Figure.getArrowLeft(i + Tile.BLOCK_SIDE, j + Tile.BLOCK_SIDE, Tile.TILE_SIDE));
-	}
-	
-	@Override
-	public void process(InputType input)
-	{
-		if (input == InputType.SWIPE_LEFT)
-		{
-			this.disabled = true;
-		}
-		else
-		{
-			this.failed = true;
-		}
+		super(i, j, TileArrowLeft.COLOR, Figure.getArrowLeft(i + Tile.BLOCK_SIDE, j + Tile.BLOCK_SIDE, Tile.TILE_SIDE), InputType.SWIPE_LEFT);
 	}
 }

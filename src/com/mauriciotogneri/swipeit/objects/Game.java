@@ -8,13 +8,13 @@ import android.opengl.GLSurfaceView;
 import com.mauriciotogneri.swipeit.MainActivity;
 import com.mauriciotogneri.swipeit.audio.AudioManager;
 import com.mauriciotogneri.swipeit.input.InputEvent;
+import com.mauriciotogneri.swipeit.media.Resources;
 import com.mauriciotogneri.swipeit.objects.tiles.Tile;
 import com.mauriciotogneri.swipeit.objects.tiles.Tile.TileType;
 import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowDown;
 import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowLeft;
 import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowRight;
 import com.mauriciotogneri.swipeit.objects.tiles.arrow.TileArrowUp;
-import com.mauriciotogneri.swipeit.objects.tiles.tap.TileSingleTap;
 
 public class Game
 {
@@ -23,59 +23,61 @@ public class Game
 	private static final int MAX_NUMBER_OF_TILES = Game.RESOLUTION_X * Game.RESOLUTION_Y;
 	private static final int DIFFICULTY_LIMIT = 10;
 	private static final int TOTAL_TIME = 60;
-
+	
 	private static final int COLOR_NORMAL = Color.argb(255, 85, 85, 85);
 	private static final int COLOR_WARNING = Color.argb(255, 255, 60, 60);
-	
+
 	private final MainActivity activity;
 	private final Renderer renderer;
 	private final AudioManager audioManager;
-	
+
 	private float time = Game.TOTAL_TIME;
 	private int score = 0;
 	private int difficultyCounter = 0;
 	private boolean finished = false;
-	
-	private final List<Tile> tiles = new ArrayList<Tile>();
 
+	private final List<Tile> tiles = new ArrayList<Tile>();
+	
 	public Game(MainActivity activity, GLSurfaceView surfaceView)
 	{
 		this.activity = activity;
 		this.renderer = new Renderer(activity, this, surfaceView);
 		this.audioManager = new AudioManager(activity);
 		this.audioManager.playAudio("audio/music/music.ogg");
-		
+
 		restart();
 	}
-	
-	public void updateScore()
+
+	public void updateScore(int value)
 	{
+		this.score += value;
+
 		if (this.score < 0)
 		{
 			this.score = 0;
 		}
-
+		
 		this.activity.updateScore(this.score);
 	}
-
+	
 	public void updateTimer()
 	{
 		int finalTime = (int)this.time;
-
+		
 		this.activity.updateTimer((finalTime > 9) ? String.valueOf(finalTime) : ("0" + finalTime), (finalTime > 9) ? Game.COLOR_NORMAL : Game.COLOR_WARNING);
-
+		
 		if ((finalTime == 0) && (!this.finished))
 		{
 			this.finished = true;
 			this.activity.showFinalScore(this.score);
 		}
 	}
-	
+
 	public Renderer getRenderer()
 	{
 		return this.renderer;
 	}
-	
+
 	public void restart()
 	{
 		this.time = Game.TOTAL_TIME;
@@ -83,40 +85,40 @@ public class Game
 		this.difficultyCounter = 0;
 		this.finished = false;
 		this.tiles.clear();
-
+		
 		createNewTile();
-		updateScore();
+		updateScore(0);
 		updateTimer();
 	}
-	
+
 	private void createNewTile()
 	{
 		Tile initialTile = getNewTile();
 		this.tiles.add(initialTile);
 	}
-	
+
 	private Tile getNewTile()
 	{
 		Random random = new Random();
-		
+
 		TileType type = TileType.values()[random.nextInt(TileType.values().length)];
-		
+
 		int i = random.nextInt(Game.RESOLUTION_X);
 		int j = random.nextInt(Game.RESOLUTION_Y);
-		
+
 		while (tileOccupied(i, j))
 		{
 			i = random.nextInt(Game.RESOLUTION_X);
 			j = random.nextInt(Game.RESOLUTION_Y);
 		}
-		
+
 		return createTile(type, i, j);
 	}
-	
+
 	private boolean tileOccupied(int i, int j)
 	{
 		boolean result = false;
-		
+
 		for (Tile tile : this.tiles)
 		{
 			if (tile.isIn(i, j))
@@ -125,14 +127,14 @@ public class Game
 				break;
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	private Tile createTile(TileType type, int i, int j)
 	{
 		Tile result = null;
-		
+
 		switch (type)
 		{
 			case UP:
@@ -147,46 +149,43 @@ public class Game
 			case RIGHT:
 				result = new TileArrowRight(i, j);
 				break;
-			case SINGLE_TAP:
-				result = new TileSingleTap(i, j);
-				break;
 		}
-
+		
 		return result;
 	}
-
+	
 	public void update(float delta, int positionLocation, int colorLocation, InputEvent input)
 	{
 		if (!this.finished)
 		{
 			this.time -= delta;
 			updateTimer();
-			
-			processInput(input);
 
+			processInput(input);
+			
 			for (Tile tile : getTileList())
 			{
 				tile.update(delta);
-				checkTile(tile);
+				processTile(tile);
 				tile.draw(positionLocation, colorLocation);
 			}
 		}
 	}
-	
+
 	private Tile[] getTileList()
 	{
 		Tile[] result = new Tile[this.tiles.size()];
 		this.tiles.toArray(result);
-		
+
 		return result;
 	}
-
+	
 	private void processInput(InputEvent input)
 	{
 		if (input.isValid())
 		{
 			Tile tile = getTile(input.x, input.y);
-
+			
 			if (tile != null)
 			{
 				if (tile.acceptsInput(input.type))
@@ -196,47 +195,67 @@ public class Game
 			}
 		}
 	}
-	
-	private void checkTile(Tile tile)
+
+	private void processTile(Tile tile)
 	{
-		if (tile.isDisabled())
+		if (tile.isSwipedOk())
 		{
-			this.tiles.remove(tile);
-			createNewTile();
+			removeAndCreate(tile);
+			
+			updateScore(1);
 
-			this.score++;
-			updateScore();
+			playSound(Resources.Sounds.SWIPE_OK);
 			
-			this.difficultyCounter++;
-			
-			if (this.difficultyCounter == Game.DIFFICULTY_LIMIT)
-			{
-				this.difficultyCounter = 0;
-				
-				if (this.tiles.size() < Game.MAX_NUMBER_OF_TILES)
-				{
-					createNewTile();
-				}
-			}
-			
-			this.audioManager.playSound("audio/sound/good.ogg");
+			increaseDifficulty();
 		}
-		else if (tile.isFailed())
+		else if (tile.isSwipedFail())
 		{
-			this.tiles.remove(tile);
-			createNewTile();
+			removeAndCreate(tile);
 
-			this.score--;
-			updateScore();
+			updateScore(-1);
 			
-			this.audioManager.playSound("audio/sound/bad.ogg");
+			this.activity.vibrate();
+		}
+		else if (tile.isTimeOut())
+		{
+			removeAndCreate(tile);
+
+			updateScore(-1);
+			
+			playSound(Resources.Sounds.SWIPE_FAIL);
 		}
 	}
+	
+	private void removeAndCreate(Tile tile)
+	{
+		this.tiles.remove(tile);
+		createNewTile();
+	}
 
+	private void increaseDifficulty()
+	{
+		this.difficultyCounter++;
+
+		if (this.difficultyCounter == Game.DIFFICULTY_LIMIT)
+		{
+			this.difficultyCounter = 0;
+
+			if (this.tiles.size() < Game.MAX_NUMBER_OF_TILES)
+			{
+				createNewTile();
+			}
+		}
+	}
+	
+	private void playSound(String soundPath)
+	{
+		this.audioManager.playSound(soundPath);
+	}
+	
 	private Tile getTile(int x, int y)
 	{
 		Tile result = null;
-		
+
 		for (Tile tile : this.tiles)
 		{
 			if (tile.isIn(x, y))
@@ -245,10 +264,10 @@ public class Game
 				break;
 			}
 		}
-		
+
 		return result;
 	}
-
+	
 	public void resume()
 	{
 		if (this.audioManager != null)
@@ -256,20 +275,20 @@ public class Game
 			this.audioManager.resumeAudio();
 		}
 	}
-
+	
 	public void pause(boolean finishing)
 	{
 		if (this.audioManager != null)
 		{
 			this.audioManager.pauseAudio();
 		}
-
+		
 		if (this.renderer != null)
 		{
 			this.renderer.pause(finishing);
 		}
 	}
-	
+
 	public void stop()
 	{
 		if (this.audioManager != null)

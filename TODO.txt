@@ -19,6 +19,7 @@ Modes:
 	classic (3 lives)
 	time trial (60 seconds - failure removes one second)
 	blind (no tile indication)
+	reverse
 	
 Select map size:
 	7x11

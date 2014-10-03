@@ -2,10 +2,12 @@ package com.mauriciotogneri.swipeit;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.WindowManager;
 import android.widget.TextView;
 import com.mauriciotogneri.swipeit.objects.Game;
@@ -14,20 +16,20 @@ public class MainActivity extends Activity
 {
 	private Game game;
 	private GLSurfaceView surfaceView;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
+		
 		setContentView(R.layout.activity_main);
-
+		
 		this.surfaceView = (GLSurfaceView)findViewById(R.id.glSurface);
 		this.game = new Game(this, this.surfaceView);
 		this.surfaceView.setRenderer(this.game.getRenderer());
 	}
-	
+
 	public void updateScore(final int score)
 	{
 		runOnUiThread(new Runnable()
@@ -40,7 +42,7 @@ public class MainActivity extends Activity
 			}
 		});
 	}
-
+	
 	public void updateTimer(final String time, final int color)
 	{
 		runOnUiThread(new Runnable()
@@ -55,6 +57,12 @@ public class MainActivity extends Activity
 		});
 	}
 	
+	public void vibrate()
+	{
+		Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+		vibrator.vibrate(300);
+	}
+
 	public void showFinalScore(final int score)
 	{
 		runOnUiThread(new Runnable()
@@ -66,7 +74,7 @@ public class MainActivity extends Activity
 				builder.setTitle("Time's up!");
 				builder.setCancelable(false);
 				builder.setMessage("\r\nScore: " + score + "\r\n");
-				
+
 				builder.setPositiveButton("Restart", new OnClickListener()
 				{
 					@Override
@@ -75,18 +83,18 @@ public class MainActivity extends Activity
 						restartGame();
 					}
 				});
-				
+
 				AlertDialog alert = builder.create();
 				alert.show();
 			}
 		});
 	}
-	
+
 	private void restartGame()
 	{
 		this.game.restart();
 	}
-
+	
 	// public void setLives(final int lives)
 	// {
 	// runOnUiThread(new Runnable()
@@ -105,39 +113,39 @@ public class MainActivity extends Activity
 	// }
 	// });
 	// }
-
+	
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		
+
 		if (this.game != null)
 		{
 			this.game.resume();
 		}
-		
+
 		if (this.surfaceView != null)
 		{
 			this.surfaceView.onResume();
 		}
 	}
-
+	
 	@Override
 	protected void onPause()
 	{
 		super.onPause();
-
+		
 		if (this.game != null)
 		{
 			this.game.pause(isFinishing());
 		}
-		
+
 		if (this.surfaceView != null)
 		{
 			this.surfaceView.onPause();
 		}
 	}
-
+	
 	@Override
 	protected void onDestroy()
 	{
@@ -145,7 +153,7 @@ public class MainActivity extends Activity
 		{
 			this.game.stop();
 		}
-		
+
 		super.onDestroy();
 	}
 }
