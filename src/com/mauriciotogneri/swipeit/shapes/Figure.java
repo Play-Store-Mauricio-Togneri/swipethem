@@ -7,7 +7,8 @@ import com.mauriciotogneri.swipeit.shapes.figures.arrows.ArrowDown;
 import com.mauriciotogneri.swipeit.shapes.figures.arrows.ArrowLeft;
 import com.mauriciotogneri.swipeit.shapes.figures.arrows.ArrowRight;
 import com.mauriciotogneri.swipeit.shapes.figures.arrows.ArrowUp;
-import com.mauriciotogneri.swipeit.shapes.figures.dots.Dot;
+import com.mauriciotogneri.swipeit.shapes.figures.stripes.StripeHorizontal;
+import com.mauriciotogneri.swipeit.shapes.figures.stripes.StripeVertical;
 
 public class Figure
 {
@@ -53,47 +54,65 @@ public class Figure
 		return result;
 	}
 
-	public static Figure getSingleDot(float x, float y, float width)
+	public static Figure getStripeHorizontal(float x, float y, float width)
 	{
 		Figure result = new Figure();
 
-		result.add(new Dot(x, y, width, Color.WHITE));
+		result.add(new StripeHorizontal(x, y, width, Color.WHITE));
 
 		return result;
 	}
 
-	public static Figure getDoubleDot(float x, float y, float width, float side)
+	public static Figure getStripeVertical(float x, float y, float width)
 	{
 		Figure result = new Figure();
 
-		result.add(new Dot(x - (side / 2), y, width, Color.WHITE));
-		result.add(new Dot(x + (side / 2), y, width, Color.WHITE));
+		result.add(new StripeVertical(x, y, width, Color.WHITE));
 
 		return result;
 	}
 
-	public static Figure getTripleDot(float x, float y, float width, float side)
-	{
-		Figure result = new Figure();
-
-		result.add(new Dot(x, y + (side / 2), width, Color.WHITE));
-		result.add(new Dot(x - (side / 2), y - (side / 2), width, Color.WHITE));
-		result.add(new Dot(x + (side / 2), y - (side / 2), width, Color.WHITE));
-
-		return result;
-	}
-
-	public static Figure getQuadrupleDot(float x, float y, float width, float side)
-	{
-		Figure result = new Figure();
-
-		result.add(new Dot(x - (side / 2), y + (side / 2), width, Color.WHITE));
-		result.add(new Dot(x - (side / 2), y - (side / 2), width, Color.WHITE));
-		result.add(new Dot(x + (side / 2), y + (side / 2), width, Color.WHITE));
-		result.add(new Dot(x + (side / 2), y - (side / 2), width, Color.WHITE));
-
-		return result;
-	}
+	// public static Figure getSingleDot(float x, float y, float width)
+	// {
+	// Figure result = new Figure();
+	//
+	// result.add(new Dot(x, y, width, Color.WHITE));
+	//
+	// return result;
+	// }
+	//
+	// public static Figure getDoubleDot(float x, float y, float width, float side)
+	// {
+	// Figure result = new Figure();
+	//
+	// result.add(new Dot(x - (side / 2), y, width, Color.WHITE));
+	// result.add(new Dot(x + (side / 2), y, width, Color.WHITE));
+	//
+	// return result;
+	// }
+	//
+	// public static Figure getTripleDot(float x, float y, float width, float side)
+	// {
+	// Figure result = new Figure();
+	//
+	// result.add(new Dot(x, y + (side / 2), width, Color.WHITE));
+	// result.add(new Dot(x - (side / 2), y - (side / 2), width, Color.WHITE));
+	// result.add(new Dot(x + (side / 2), y - (side / 2), width, Color.WHITE));
+	//
+	// return result;
+	// }
+	//
+	// public static Figure getQuadrupleDot(float x, float y, float width, float side)
+	// {
+	// Figure result = new Figure();
+	//
+	// result.add(new Dot(x - (side / 2), y + (side / 2), width, Color.WHITE));
+	// result.add(new Dot(x - (side / 2), y - (side / 2), width, Color.WHITE));
+	// result.add(new Dot(x + (side / 2), y + (side / 2), width, Color.WHITE));
+	// result.add(new Dot(x + (side / 2), y - (side / 2), width, Color.WHITE));
+	//
+	// return result;
+	// }
 
 	public void add(Shape shape)
 	{
