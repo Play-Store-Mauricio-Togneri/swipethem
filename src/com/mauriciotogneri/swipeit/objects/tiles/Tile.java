@@ -16,12 +16,16 @@ public abstract class Tile
 	private final int color;
 	
 	private float alpha = 0;
-	private float timer = 0;
+	private float timerActive = 0;
+	private float timerFinished = 0;
 	
-	protected boolean swipedOk = false;
-	protected boolean swipedFail = false;
-	protected boolean timeOut = false;
-	protected boolean disapear = false;
+	private State state = State.ACTIVE;
+	
+	private boolean swipedOk = false;
+	private boolean swipedFail = false;
+	private boolean timeOut = false;
+	private boolean disapear = false;
+	private boolean finished = false;
 	
 	private final Square squareBackground;
 	private final Figure figure;
@@ -56,6 +60,11 @@ public abstract class Tile
 		}
 	}
 	
+	private enum State
+	{
+		ACTIVE, FINISHED;
+	}
+
 	public Tile(int i, int j, int color, Figure figure, InputType[] validInputs)
 	{
 		this.i = i;
@@ -95,11 +104,32 @@ public abstract class Tile
 		return result;
 	}
 	
-	public abstract void process(InputType input);
+	public void processInput(InputType input)
+	{
+		if (this.state == State.ACTIVE)
+		{
+			process(input);
+		}
+	}
+
+	protected abstract void process(InputType input);
 	
 	public void update(float delta)
 	{
-		this.timer += delta;
+		switch (this.state)
+		{
+			case ACTIVE:
+				updateActive(delta);
+				break;
+			case FINISHED:
+				updateFinished(delta);
+				break;
+		}
+	}
+
+	private void updateActive(float delta)
+	{
+		this.timerActive += delta;
 		this.alpha += (delta * 3);
 		
 		if (this.alpha > 1)
@@ -107,7 +137,7 @@ public abstract class Tile
 			this.alpha = 1;
 		}
 		
-		if (this.timer > Tile.TIME_LIMIT)
+		if (this.timerActive > Tile.TIME_LIMIT)
 		{
 			if (isFake())
 			{
@@ -117,6 +147,19 @@ public abstract class Tile
 			{
 				this.timeOut = true;
 			}
+			
+			this.state = State.FINISHED;
+		}
+	}
+	
+	private void updateFinished(float delta)
+	{
+		this.timerFinished += delta;
+		this.alpha -= (delta * 4);
+		
+		if (this.alpha < 0)
+		{
+			this.finished = true;
 		}
 	}
 	
@@ -124,12 +167,32 @@ public abstract class Tile
 	{
 		return this.swipedOk;
 	}
+
+	protected void setSwipeOk(boolean value)
+	{
+		this.swipedOk = value;
+		
+		if (value)
+		{
+			this.state = State.FINISHED;
+		}
+	}
 	
 	public boolean isSwipedFail()
 	{
 		return this.swipedFail;
 	}
 	
+	protected void setSwipeFail(boolean value)
+	{
+		this.swipedFail = value;
+
+		if (value)
+		{
+			this.state = State.FINISHED;
+		}
+	}
+
 	public boolean isTimeOut()
 	{
 		return this.timeOut;
@@ -140,6 +203,11 @@ public abstract class Tile
 		return this.disapear;
 	}
 	
+	public boolean isFinished()
+	{
+		return this.finished;
+	}
+	
 	public boolean isFake()
 	{
 		return false;
@@ -147,14 +215,35 @@ public abstract class Tile
 	
 	public void draw(int positionLocation, int colorLocation)
 	{
-		this.squareBackground.draw(positionLocation, colorLocation, this.alpha);
-		
-		Square squareForeground = new Square(this.x, this.y, Tile.TILE_SIDE * (this.timer / Tile.TIME_LIMIT), this.color);
-		squareForeground.draw(positionLocation, colorLocation, this.alpha);
-		
-		if (this.figure != null)
+		if (this.state == State.ACTIVE)
 		{
-			this.figure.draw(positionLocation, colorLocation, this.alpha);
+			this.squareBackground.draw(positionLocation, colorLocation, this.alpha);
+			
+			Square squareForeground = new Square(this.x, this.y, Tile.TILE_SIDE * (this.timerActive / Tile.TIME_LIMIT), this.color);
+			squareForeground.draw(positionLocation, colorLocation, this.alpha);
+			
+			if (this.figure != null)
+			{
+				this.figure.draw(positionLocation, colorLocation, this.alpha);
+			}
+		}
+		else
+		{
+			if (this.swipedOk)
+			{
+				Square squareForeground = new Square(this.x, this.y, Tile.TILE_SIDE * (1 + this.timerFinished), this.color);
+				squareForeground.draw(positionLocation, colorLocation, this.alpha);
+			}
+			else
+			{
+				Square squareForeground = new Square(this.x, this.y, Tile.TILE_SIDE / (1 + this.timerFinished), this.color);
+				squareForeground.draw(positionLocation, colorLocation, this.alpha);
+			}
+
+			if (this.figure != null)
+			{
+				this.figure.draw(positionLocation, colorLocation, this.alpha);
+			}
 		}
 	}
 }

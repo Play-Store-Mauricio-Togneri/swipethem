@@ -41,7 +41,8 @@ public class Game
 	private int difficultyCounter = 0;
 	private boolean finished = false;
 	
-	private final List<Tile> tiles = new ArrayList<Tile>();
+	private final List<Tile> activeTiles = new ArrayList<Tile>();
+	private final List<Tile> finishedTiles = new ArrayList<Tile>();
 
 	public Game(MainActivity activity, GLSurfaceView surfaceView)
 	{
@@ -89,7 +90,8 @@ public class Game
 		this.score = 0;
 		this.difficultyCounter = 0;
 		this.finished = false;
-		this.tiles.clear();
+		this.activeTiles.clear();
+		this.finishedTiles.clear();
 
 		createNormalTile();
 		updateScore(0);
@@ -99,13 +101,13 @@ public class Game
 	private void createNormalTile()
 	{
 		Tile initialTile = getTile(TileType.NORMAL_ARROW_UP, TileType.NORMAL_ARROW_DOWN, TileType.NORMAL_ARROW_LEFT, TileType.NORMAL_ARROW_RIGHT);
-		this.tiles.add(initialTile);
+		this.activeTiles.add(initialTile);
 	}
 
 	private void createFakeTile()
 	{
 		Tile initialTile = getTile(TileType.FAKE_ARROW_UP, TileType.FAKE_ARROW_DOWN, TileType.FAKE_ARROW_LEFT, TileType.FAKE_ARROW_RIGHT);
-		this.tiles.add(initialTile);
+		this.activeTiles.add(initialTile);
 	}
 	
 	private Tile getTile(TileType... types)
@@ -137,12 +139,24 @@ public class Game
 	{
 		boolean result = false;
 		
-		for (Tile tile : this.tiles)
+		for (Tile tile : this.activeTiles)
 		{
 			if (tile.isIn(i, j))
 			{
 				result = true;
 				break;
+			}
+		}
+		
+		if (!result)
+		{
+			for (Tile tile : this.finishedTiles)
+			{
+				if (tile.isIn(i, j))
+				{
+					result = true;
+					break;
+				}
 			}
 		}
 		
@@ -193,19 +207,35 @@ public class Game
 			
 			processInput(input);
 
-			for (Tile tile : getTileList())
+			// TODO: FUSE BOTH LISTS
+			for (Tile tile : getActiveTileList())
 			{
 				tile.update(delta);
-				processTile(tile);
+				processActiveTile(tile);
+				tile.draw(positionLocation, colorLocation);
+			}
+
+			for (Tile tile : getFinishedTileList())
+			{
+				tile.update(delta);
+				processFinishedTile(tile);
 				tile.draw(positionLocation, colorLocation);
 			}
 		}
 	}
 	
-	private Tile[] getTileList()
+	private Tile[] getActiveTileList()
 	{
-		Tile[] result = new Tile[this.tiles.size()];
-		this.tiles.toArray(result);
+		Tile[] result = new Tile[this.activeTiles.size()];
+		this.activeTiles.toArray(result);
+		
+		return result;
+	}
+	
+	private Tile[] getFinishedTileList()
+	{
+		Tile[] result = new Tile[this.finishedTiles.size()];
+		this.finishedTiles.toArray(result);
 		
 		return result;
 	}
@@ -220,13 +250,13 @@ public class Game
 			{
 				if (tile.acceptsInput(input.type))
 				{
-					tile.process(input.type);
+					tile.processInput(input.type);
 				}
 			}
 		}
 	}
 	
-	private void processTile(Tile tile)
+	private void processActiveTile(Tile tile)
 	{
 		if (tile.isSwipedOk())
 		{
@@ -262,10 +292,19 @@ public class Game
 			removeTile(tile);
 		}
 	}
+	
+	private void processFinishedTile(Tile tile)
+	{
+		if (tile.isFinished())
+		{
+			this.finishedTiles.remove(tile);
+		}
+	}
 
 	private void removeTile(Tile tile)
 	{
-		this.tiles.remove(tile);
+		this.activeTiles.remove(tile);
+		this.finishedTiles.add(tile);
 
 		if (tile.isFake())
 		{
@@ -287,7 +326,7 @@ public class Game
 				createFakeTile();
 			}
 			
-			if (this.tiles.size() < Game.MAX_NUMBER_OF_TILES)
+			if ((this.activeTiles.size() + this.finishedTiles.size()) < Game.MAX_NUMBER_OF_TILES)
 			{
 				createNormalTile();
 			}
@@ -303,7 +342,7 @@ public class Game
 	{
 		Tile result = null;
 		
-		for (Tile tile : this.tiles)
+		for (Tile tile : this.activeTiles)
 		{
 			if (tile.isIn(x, y))
 			{
