@@ -1,25 +1,10 @@
-Correct:
-	Swipe up
-	Swipe down
-	Swipe left
-	Swipe right
-	1 tap
-	2 taps
-	3 taps
-	4 taps
-	hold X seconds
+New tiles:
+	extra life (hold for 5 seconds)
+	extra time (hold for 5 seconds)
+	time bomb (hold for 5 seconds to defuse)
 
-Incorrect:
-	wait too much to remove a tile (timeout)
-	press in a mine
-	incorrect gesture on a tile
-	fail to defuse the bomb (hold it for X seconds to defuse correctly)
-	
 Modes:
+	time trial (60 seconds)
 	classic (3 lives)
-	time trial (60 seconds - failure removes one second)
 	blind (no tile indication)
 	reverse
-	
-Select map size:
-	7x11
