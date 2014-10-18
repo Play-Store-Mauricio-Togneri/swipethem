@@ -70,5 +70,7 @@
 	</LinearLayout>
 	
     <include layout="@layout/block_screen"/>
+    
+    <include layout="@layout/how_to_play"/>
 	    
 </FrameLayout>
