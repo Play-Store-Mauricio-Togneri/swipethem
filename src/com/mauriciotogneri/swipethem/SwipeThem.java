@@ -6,13 +6,11 @@ import org.acra.sender.HttpSender.Type;
 import android.app.Application;
 import android.os.StrictMode;
 import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Tracker;
+import com.mauriciotogneri.swipethem.util.Statistics;
 
 @ReportsCrashes(formUri = "http://zeronest.com/acra/report.php", reportType = Type.FORM, formKey = "")
 public class SwipeThem extends Application
 {
-	private Tracker tracker;
-	
 	@Override
 	public void onCreate()
 	{
@@ -32,12 +30,6 @@ public class SwipeThem extends Application
 		StrictMode.setVmPolicy(vmBuilder.build());
 
 		GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-		this.tracker = analytics.newTracker(R.xml.app_tracker);
-	}
-	
-	public Tracker getTracker()
-	{
-		// TODO: CONFIGURE TRACKER XML
-		return this.tracker;
+		Statistics.initialize(analytics.newTracker(R.xml.app_tracker));
 	}
 }
