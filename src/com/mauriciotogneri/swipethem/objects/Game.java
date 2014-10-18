@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 import android.graphics.Color;
 import android.opengl.GLSurfaceView;
-import com.mauriciotogneri.swipethem.MainActivity;
+import com.mauriciotogneri.swipethem.activities.MainActivity;
 import com.mauriciotogneri.swipethem.audio.AudioManager;
 import com.mauriciotogneri.swipethem.input.InputEvent;
 import com.mauriciotogneri.swipethem.media.Resources;

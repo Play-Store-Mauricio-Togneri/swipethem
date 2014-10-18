@@ -6,5 +6,13 @@
     
     <string name="label_score">SCORE</string>
     <string name="label_best">BEST</string>
+    
+    <string name="games_api_id">827376388036</string>
+	<string name="achievement_50">CgkIxI_nm4oYEAIQAQ</string>
+	<string name="achievement_75">CgkIxI_nm4oYEAIQAg</string>
+	<string name="achievement_100">CgkIxI_nm4oYEAIQAw</string>
+	<string name="achievement_150">CgkIxI_nm4oYEAIQBA</string>
+	<string name="achievement_200">CgkIxI_nm4oYEAIQBQ</string>
+	<string name="leaderboard_high_scores">CgkIxI_nm4oYEAIQBg</string>
 
 </resources>
