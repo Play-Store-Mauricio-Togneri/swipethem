@@ -82,7 +82,7 @@
         android:gravity="center"
         android:padding="10dp" >
 
-        <com.mauriciotogneri.swipeit.ui.CustomSurfaceView
+        <com.mauriciotogneri.swipethem.ui.CustomSurfaceView
             android:id="@+id/glSurface"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
