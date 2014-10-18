@@ -4,6 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B4000000"
+        android:visibility="gone">
+        
+        
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,35 +40,6 @@
             	android:drawableLeft="@drawable/clock"
             	android:drawablePadding="10dp"
             	android:textSize="25sp"/>
-
-            <!--
-            <ImageView
-                android:id="@+id/life1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/image_description"
-                android:paddingLeft="0dp"
-                android:paddingRight="10dp"
-                android:src="@drawable/heart" />
-                
-            <ImageView
-                android:id="@+id/life2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/image_description"
-                android:paddingLeft="0dp"
-                android:paddingRight="10dp"
-                android:src="@drawable/heart" />
-
-            <ImageView
-                android:id="@+id/life3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/image_description"
-                android:paddingLeft="0dp"
-                android:paddingRight="10dp"
-                android:src="@drawable/heart" />
-              -->
             
         </LinearLayout>
 
@@ -70,6 +50,7 @@
             android:layout_gravity="center_vertical|right"
             android:gravity="center_vertical|right"
             android:paddingRight="5dp"
+            android:paddingLeft="0dp"
             android:textColor="#555555"
             android:textSize="25sp" />
         
