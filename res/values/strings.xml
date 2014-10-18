@@ -2,7 +2,9 @@
 <resources>
 
     <string name="app_name">Swipe Them</string>
-    
     <string name="image_description"></string>
+    
+    <string name="label_score">SCORE</string>
+    <string name="label_best">BEST</string>
 
 </resources>

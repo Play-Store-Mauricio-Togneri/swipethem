@@ -1,14 +1,17 @@
 package com.mauriciotogneri.swipethem;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.mauriciotogneri.swipethem.objects.Game;
 import com.mauriciotogneri.swipethem.util.Statistics;
@@ -17,22 +20,27 @@ public class MainActivity extends Activity
 {
 	private Game game;
 	private GLSurfaceView surfaceView;
-	
+
+	private static final String ATTRIBUTE_BEST = "BEST";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		Window window = getWindow();
+		window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 		setContentView(R.layout.activity_main);
-		
+
 		this.surfaceView = (GLSurfaceView)findViewById(R.id.glSurface);
 		this.game = new Game(this, this.surfaceView);
 		this.surfaceView.setRenderer(this.game.getRenderer());
-
+		
 		Statistics.sendHitAppLaunched();
 	}
-
+	
 	public void updateScore(final int score)
 	{
 		runOnUiThread(new Runnable()
@@ -45,7 +53,7 @@ public class MainActivity extends Activity
 			}
 		});
 	}
-	
+
 	public void updateTimer(final String time, final int color)
 	{
 		runOnUiThread(new Runnable()
@@ -59,13 +67,13 @@ public class MainActivity extends Activity
 			}
 		});
 	}
-	
+
 	public void vibrate()
 	{
 		Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 		vibrator.vibrate(300);
 	}
-
+	
 	public void showFinalScore(final int score)
 	{
 		runOnUiThread(new Runnable()
@@ -73,82 +81,90 @@ public class MainActivity extends Activity
 			@Override
 			public void run()
 			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-				builder.setTitle("Time's up!");
-				builder.setCancelable(false);
-				builder.setMessage("\r\nScore: " + score + "\r\n");
+				displayFinalScore(score);
+			}
+		});
+	}
+	
+	private void displayFinalScore(int score)
+	{
+		SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+		int bestScore = preferences.getInt(MainActivity.ATTRIBUTE_BEST, 0);
 
-				builder.setPositiveButton("Restart", new OnClickListener()
-				{
-					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						restartGame();
-					}
-				});
+		if (score > bestScore)
+		{
+			bestScore = score;
 
-				AlertDialog alert = builder.create();
-				alert.show();
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putInt(MainActivity.ATTRIBUTE_BEST, bestScore);
+			editor.commit();
+		}
+
+		submitScore(bestScore);
+		
+		final LinearLayout blockScreen = (LinearLayout)findViewById(R.id.block_screen);
+		blockScreen.setVisibility(View.VISIBLE);
+
+		TextView labelScore = (TextView)blockScreen.findViewById(R.id.score_value);
+		labelScore.setText(String.valueOf(score));
+		
+		TextView labelBest = (TextView)blockScreen.findViewById(R.id.best_value);
+		labelBest.setText(String.valueOf(bestScore));
+
+		ImageView play = (ImageView)blockScreen.findViewById(R.id.play);
+		play.setOnClickListener(new OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				blockScreen.setVisibility(View.GONE);
+				restartGame();
 			}
 		});
 	}
 
+	private void submitScore(int score)
+	{
+		// TODO
+	}
+	
 	private void restartGame()
 	{
 		this.game.restart();
 	}
 	
-	// public void setLives(final int lives)
-	// {
-	// runOnUiThread(new Runnable()
-	// {
-	// @Override
-	// public void run()
-	// {
-	// ImageView life1 = (ImageView)findViewById(R.id.life1);
-	// life1.setVisibility((lives > 0) ? View.VISIBLE : View.GONE);
-	//
-	// ImageView life2 = (ImageView)findViewById(R.id.life2);
-	// life2.setVisibility((lives > 1) ? View.VISIBLE : View.GONE);
-	//
-	// ImageView life3 = (ImageView)findViewById(R.id.life3);
-	// life3.setVisibility((lives > 2) ? View.VISIBLE : View.GONE);
-	// }
-	// });
-	// }
-	
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-
+		
 		if (this.game != null)
 		{
 			this.game.resume();
 		}
-
+		
 		if (this.surfaceView != null)
 		{
 			this.surfaceView.onResume();
 		}
 	}
-	
+
 	@Override
 	protected void onPause()
 	{
 		super.onPause();
-		
+
 		if (this.game != null)
 		{
 			this.game.pause(isFinishing());
 		}
-
+		
 		if (this.surfaceView != null)
 		{
 			this.surfaceView.onPause();
 		}
 	}
-	
+
 	@Override
 	protected void onDestroy()
 	{
@@ -156,7 +172,7 @@ public class MainActivity extends Activity
 		{
 			this.game.stop();
 		}
-
+		
 		super.onDestroy();
 	}
 }

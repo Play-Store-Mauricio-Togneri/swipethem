@@ -102,12 +102,12 @@ public abstract class Tile
 	
 	protected abstract void process(InputType input);
 
-	public void update(float delta)
+	public void update(float delta, boolean started)
 	{
 		switch (this.state)
 		{
 			case ACTIVE:
-				updateActive(delta);
+				updateActive(delta, started);
 				break;
 			case FINISHED:
 				updateFinished(delta);
@@ -115,28 +115,33 @@ public abstract class Tile
 		}
 	}
 	
-	private void updateActive(float delta)
+	private void updateActive(float delta, boolean started)
 	{
-		this.timerActive += delta;
+		
 		this.alpha += (delta * 3);
-
+		
 		if (this.alpha > 1)
 		{
 			this.alpha = 1;
 		}
-
-		if (this.timerActive > Tile.TIME_LIMIT)
+		
+		if (started)
 		{
-			if (isFake())
+			this.timerActive += delta;
+			
+			if (this.timerActive > Tile.TIME_LIMIT)
 			{
-				this.disapear = true;
+				if (isFake())
+				{
+					this.disapear = true;
+				}
+				else
+				{
+					this.timeOut = true;
+				}
+				
+				this.state = State.FINISHED;
 			}
-			else
-			{
-				this.timeOut = true;
-			}
-
-			this.state = State.FINISHED;
 		}
 	}
 
