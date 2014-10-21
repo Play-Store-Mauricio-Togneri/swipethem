@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
-import android.content.SharedPreferences;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -22,6 +21,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.mauriciotogneri.swipethem.R;
 import com.mauriciotogneri.swipethem.objects.Game;
+import com.mauriciotogneri.swipethem.util.Preferences;
 import com.mauriciotogneri.swipethem.util.Statistics;
 
 public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
@@ -33,9 +33,6 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 	private boolean intentInProgress = false;
 	private boolean openingLeaderboard = false;
 	private boolean helpOpened = false;
-
-	private static final String ATTRIBUTE_BEST = "BEST";
-	private static final String ATTRIBUTE_FIRST_LAUNCH = "FIRST_LAUNCH";
 
 	private static final int REQUEST_RESOLVE_ERROR = 1001;
 	
@@ -61,38 +58,34 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 		this.game = new Game(this, this.surfaceView);
 		this.surfaceView.setRenderer(this.game.getRenderer());
 		
+		Preferences.initialize(this);
 		Statistics.sendHitAppLaunched();
 		
 		GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this, this, this);
 		builder.addApi(Games.API).addScope(Games.SCOPE_GAMES);
 		this.apiClient = builder.build();
 		
-		if (firstLaunch())
+		if (Preferences.isConnectedPlayGameServices())
 		{
+			this.apiClient.connect();
+		}
+		
+		if (Preferences.isFirstLaunch())
+		{
+			Preferences.setFirstLaunch();
 			displayHelp();
 		}
-	}
-
-	private boolean firstLaunch()
-	{
-		SharedPreferences preferences = getSharedPreferences(MainActivity.class.toString(), Context.MODE_PRIVATE);
-		boolean result = preferences.getBoolean(MainActivity.ATTRIBUTE_FIRST_LAUNCH, true);
-
-		if (result)
-		{
-			SharedPreferences.Editor editor = getSharedPreferences(MainActivity.class.toString(), Context.MODE_PRIVATE).edit();
-			editor.putBoolean(MainActivity.ATTRIBUTE_FIRST_LAUNCH, false);
-			editor.commit();
-		}
-
-		return result;
 	}
 	
 	@Override
 	public void onConnected(Bundle connectionHint)
 	{
+		Preferences.setConnectedPlayGameServices();
+
 		if (this.openingLeaderboard)
 		{
+			submitScore(Preferences.getBestScore());
+			
 			showRanking();
 		}
 	}
@@ -185,16 +178,12 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 	
 	private void displayFinalScore(int score)
 	{
-		SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-		int bestScore = preferences.getInt(MainActivity.ATTRIBUTE_BEST, 0);
+		int bestScore = Preferences.getBestScore();
 
 		if (score > bestScore)
 		{
 			bestScore = score;
-
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putInt(MainActivity.ATTRIBUTE_BEST, bestScore);
-			editor.commit();
+			Preferences.setBestScore(bestScore);
 		}
 
 		submitScore(bestScore);
