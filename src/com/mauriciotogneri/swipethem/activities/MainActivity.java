@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
@@ -28,74 +30,74 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 {
 	private Game game;
 	private GLSurfaceView surfaceView;
-
+	
 	private GoogleApiClient apiClient;
 	private boolean intentInProgress = false;
 	private boolean openingLeaderboard = false;
 	private boolean helpOpened = false;
-
-	private static final int REQUEST_RESOLVE_ERROR = 1001;
 	
+	private static final int REQUEST_RESOLVE_ERROR = 1001;
+
 	private static final int ACHIVEMENT_50 = 50;
 	private static final int ACHIVEMENT_75 = 75;
 	private static final int ACHIVEMENT_100 = 100;
 	private static final int ACHIVEMENT_150 = 150;
 	private static final int ACHIVEMENT_200 = 200;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
+
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+		
 		setContentView(R.layout.activity_main);
-
+		
 		this.surfaceView = (GLSurfaceView)findViewById(R.id.glSurface);
 		this.game = new Game(this, this.surfaceView);
 		this.surfaceView.setRenderer(this.game.getRenderer());
-		
+
 		Preferences.initialize(this);
 		Statistics.sendHitAppLaunched();
-		
+
 		GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this, this, this);
 		builder.addApi(Games.API).addScope(Games.SCOPE_GAMES);
 		this.apiClient = builder.build();
-		
+
 		if (Preferences.isConnectedPlayGameServices())
 		{
 			this.apiClient.connect();
 		}
-		
+
 		if (Preferences.isFirstLaunch())
 		{
 			Preferences.setFirstLaunch();
 			displayHelp();
 		}
 	}
-	
+
 	@Override
 	public void onConnected(Bundle connectionHint)
 	{
 		Preferences.setConnectedPlayGameServices();
-
+		
 		if (this.openingLeaderboard)
 		{
 			submitScore(Preferences.getBestScore());
-			
+
 			showRanking();
 		}
 	}
-
+	
 	@Override
 	public void onConnectionSuspended(int cause)
 	{
 		this.apiClient.reconnect();
 	}
-
+	
 	@Override
 	public void onConnectionFailed(ConnectionResult result)
 	{
@@ -113,14 +115,14 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 			}
 		}
 	}
-
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 		if (requestCode == MainActivity.REQUEST_RESOLVE_ERROR)
 		{
 			this.intentInProgress = false;
-
+			
 			if (resultCode == Activity.RESULT_OK)
 			{
 				if ((!this.apiClient.isConnecting()) && (!this.apiClient.isConnected()))
@@ -130,7 +132,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 			}
 		}
 	}
-	
+
 	public void updateScore(final int score)
 	{
 		runOnUiThread(new Runnable()
@@ -143,7 +145,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 			}
 		});
 	}
-
+	
 	public void updateTimer(final String time, final int color)
 	{
 		runOnUiThread(new Runnable()
@@ -157,13 +159,13 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 			}
 		});
 	}
-
+	
 	public void vibrate()
 	{
 		Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 		vibrator.vibrate(300);
 	}
-	
+
 	public void showFinalScore(final int score)
 	{
 		runOnUiThread(new Runnable()
@@ -175,28 +177,32 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 			}
 		});
 	}
-	
+
 	private void displayFinalScore(int score)
 	{
 		int bestScore = Preferences.getBestScore();
-
+		
 		if (score > bestScore)
 		{
 			bestScore = score;
 			Preferences.setBestScore(bestScore);
 		}
-
-		submitScore(bestScore);
 		
+		submitScore(bestScore);
+
 		final LinearLayout blockScreen = (LinearLayout)findViewById(R.id.block_screen);
 		blockScreen.setVisibility(View.VISIBLE);
 
+		AdView mAdView = (AdView)blockScreen.findViewById(R.id.banner_bottom);
+		AdRequest adRequest = new AdRequest.Builder().build();
+		mAdView.loadAd(adRequest);
+		
 		TextView labelScore = (TextView)blockScreen.findViewById(R.id.score_value);
 		labelScore.setText(String.valueOf(score));
-		
+
 		TextView labelBest = (TextView)blockScreen.findViewById(R.id.best_value);
 		labelBest.setText(String.valueOf(bestScore));
-
+		
 		ImageView play = (ImageView)blockScreen.findViewById(R.id.play);
 		play.setOnClickListener(new OnClickListener()
 		{
@@ -207,7 +213,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 				restartGame();
 			}
 		});
-
+		
 		ImageView leaderboard = (ImageView)blockScreen.findViewById(R.id.ranking);
 		leaderboard.setOnClickListener(new OnClickListener()
 		{
@@ -217,7 +223,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 				showRanking();
 			}
 		});
-		
+
 		ImageView howToPlay = (ImageView)blockScreen.findViewById(R.id.help);
 		howToPlay.setOnClickListener(new OnClickListener()
 		{
@@ -228,13 +234,13 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 			}
 		});
 	}
-	
+
 	private void displayHelp()
 	{
 		this.helpOpened = true;
 		final ScrollView howToPlay = (ScrollView)findViewById(R.id.how_to_play);
 		howToPlay.setVisibility(View.VISIBLE);
-
+		
 		Button start = (Button)howToPlay.findViewById(R.id.start);
 		start.setOnClickListener(new OnClickListener()
 		{
@@ -245,20 +251,20 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 			}
 		});
 	}
-	
+
 	private void closeHelp()
 	{
 		ScrollView howToPlay = (ScrollView)findViewById(R.id.how_to_play);
 		howToPlay.setVisibility(View.GONE);
 		this.helpOpened = false;
 	}
-
+	
 	private void submitScore(int score)
 	{
 		if (this.apiClient.isConnected())
 		{
 			Games.Leaderboards.submitScore(this.apiClient, getString(R.string.leaderboard_high_scores), score);
-
+			
 			if (score >= MainActivity.ACHIVEMENT_200)
 			{
 				Games.Achievements.unlock(this.apiClient, getString(R.string.achievement_200));
@@ -281,7 +287,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 			}
 		}
 	}
-
+	
 	private void showRanking()
 	{
 		if (this.apiClient.isConnected())
@@ -295,12 +301,12 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 			this.apiClient.connect();
 		}
 	}
-	
+
 	private void restartGame()
 	{
 		this.game.restart();
 	}
-	
+
 	@Override
 	public void onBackPressed()
 	{
@@ -313,39 +319,39 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 			super.onBackPressed();
 		}
 	}
-	
+
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		
+
 		if (this.game != null)
 		{
 			this.game.resume();
 		}
-		
+
 		if (this.surfaceView != null)
 		{
 			this.surfaceView.onResume();
 		}
 	}
-
+	
 	@Override
 	protected void onPause()
 	{
 		super.onPause();
-
+		
 		if (this.game != null)
 		{
 			this.game.pause(isFinishing());
 		}
-		
+
 		if (this.surfaceView != null)
 		{
 			this.surfaceView.onPause();
 		}
 	}
-
+	
 	@Override
 	protected void onDestroy()
 	{
@@ -353,12 +359,12 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 		{
 			this.game.stop();
 		}
-
+		
 		if ((this.apiClient != null) && this.apiClient.isConnected())
 		{
 			this.apiClient.disconnect();
 		}
-		
+
 		super.onDestroy();
 	}
 }
