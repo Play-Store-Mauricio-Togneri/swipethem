@@ -19,25 +19,25 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 	private final Game game;
 	
 	private long startTime;
-
+	
 	// OpenGL
 	private int width = 0;
 	private int height = 0;
-
+	
 	private static final String U_MATRIX = "u_Matrix";
 	private static final String U_COLOR = "u_Color";
 	private static final String A_POSITION = "a_Position";
 	
 	private final float[] projectionMatrix = new float[16];
-
+	
 	private int matrixLocation;
 	private int positionLocation;
 	private int colorLocation;
-
+	
 	// input
 	private final Object inputLock = new Object();
 	private final InputEvent lastInput = new InputEvent();
-
+	
 	// state
 	private RendererStatus state = null;
 	private final Object stateChangedLock = new Object();
@@ -52,7 +52,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		this.context = context;
 		this.game = game;
 		this.startTime = System.nanoTime();
-
+		
 		surfaceView.setOnTouchListener(new GestureManager()
 		{
 			@Override
@@ -60,19 +60,19 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 			{
 				setInput(InputType.TAP_DOWN, getScreenX(x), getScreenY(y));
 			}
-
+			
 			@Override
 			public void onTapUp(float x, float y)
 			{
 				setInput(InputType.TAP_UP, getScreenX(x), getScreenY(y));
 			}
-
+			
 			@Override
 			public void onSwipeUp(float x, float y)
 			{
 				setInput(InputType.SWIPE_UP, getScreenX(x), getScreenY(y));
 			}
-
+			
 			@Override
 			public void onSwipeDown(float x, float y)
 			{
@@ -117,7 +117,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		GLES20.glEnable(GLES20.GL_BLEND);
 		GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 		GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-
+		
 		GLES20.glClearColor(1f, 1f, 1f, 1f);
 		
 		String vertexShaderSource = TextResourceReader.readTextFileFromResource(this.context, R.raw.vertex_shader);
@@ -130,7 +130,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		this.colorLocation = GLES20.glGetUniformLocation(program, Renderer.U_COLOR);
 		this.positionLocation = GLES20.glGetAttribLocation(program, Renderer.A_POSITION);
 	}
-
+	
 	@Override
 	public void onSurfaceChanged(GL10 unused, int width, int height)
 	{
@@ -140,7 +140,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		GLES20.glViewport(0, 0, width, height);
 		
 		Matrix.orthoM(this.projectionMatrix, 0, 0, Game.RESOLUTION_X, 0, Game.RESOLUTION_Y, -1f, 1f);
-
+		
 		synchronized (this.stateChangedLock)
 		{
 			this.state = RendererStatus.RUNNING;
@@ -153,32 +153,32 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 	{
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 		GLES20.glUniformMatrix4fv(this.matrixLocation, 1, false, this.projectionMatrix, 0);
-
+		
 		synchronized (this.inputLock)
 		{
 			this.game.update(delta, this.positionLocation, this.colorLocation, this.lastInput);
 			this.lastInput.clear();
 		}
 	}
-
+	
 	@Override
 	public void onDrawFrame(GL10 unused)
 	{
 		RendererStatus status = null;
-
+		
 		synchronized (this.stateChangedLock)
 		{
 			status = this.state;
 		}
-
+		
 		if (status == RendererStatus.RUNNING)
 		{
 			long currentTime = System.nanoTime();
-			float delta = (currentTime - this.startTime) / 1000000000f;
+			float delta = (currentTime - this.startTime) / 1E9f;
 			this.startTime = currentTime;
-
+			
 			// FPS.log(currentTime);
-
+			
 			update(delta);
 		}
 		else if ((status == RendererStatus.PAUSED) || (status == RendererStatus.FINISHED))
@@ -190,7 +190,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 			}
 		}
 	}
-
+	
 	public void pause(boolean finishing)
 	{
 		synchronized (this.stateChangedLock)
@@ -205,7 +205,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 				{
 					this.state = RendererStatus.PAUSED;
 				}
-
+				
 				while (true)
 				{
 					try

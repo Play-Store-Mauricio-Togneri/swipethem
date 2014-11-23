@@ -30,7 +30,7 @@ public class TimeCounter
 	{
 		if (this.enabled)
 		{
-			this.totalTime += (System.nanoTime() - this.start) / 1000;
+			this.totalTime += (System.nanoTime() - this.start) / 1E3;
 			this.times++;
 			Log.e("DEBUG", this.name + (this.totalTime / this.times) + " us");
 		}
