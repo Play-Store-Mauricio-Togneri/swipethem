@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.mauriciotogneri.swipethem.R;
 import com.mauriciotogneri.swipethem.objects.Game;
 import com.mauriciotogneri.swipethem.util.Preferences;
-import com.mauriciotogneri.swipethem.util.Statistics;
 
 public class MainActivity extends Activity
 {
@@ -44,7 +43,6 @@ public class MainActivity extends Activity
         this.surfaceView.setRenderer(this.game.getRenderer());
 
         Preferences.initialize(this);
-        Statistics.sendHitAppLaunched();
 
         if (Preferences.isFirstLaunch())
         {

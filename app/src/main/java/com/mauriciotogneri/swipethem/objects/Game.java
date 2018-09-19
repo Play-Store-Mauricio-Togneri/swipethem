@@ -17,7 +17,6 @@ import com.mauriciotogneri.swipethem.objects.tiles.arrows.normal.NormalTileArrow
 import com.mauriciotogneri.swipethem.objects.tiles.arrows.normal.NormalTileArrowLeft;
 import com.mauriciotogneri.swipethem.objects.tiles.arrows.normal.NormalTileArrowRight;
 import com.mauriciotogneri.swipethem.objects.tiles.arrows.normal.NormalTileArrowUp;
-import com.mauriciotogneri.swipethem.util.Statistics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,8 +107,6 @@ public class Game
             createNormalTile();
             updateScore(0);
             updateTimer();
-
-            Statistics.sendHitNewGame();
         }
     }
 
